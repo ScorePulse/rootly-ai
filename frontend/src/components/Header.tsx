@@ -1,11 +1,16 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { MdMenu, MdClose } from "react-icons/md";
 import { useAuth } from "../hooks/useAuth";
 
 const Header = () => {
   const [isOpen, setIsOpen] = useState(false);
   const { logout } = useAuth();
+  const location = useLocation();
+
+  if (location.pathname === "/") {
+    return null;
+  }
 
   return (
     <header className="bg-purple-700 text-white p-4">
