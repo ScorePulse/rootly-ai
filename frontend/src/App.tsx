@@ -11,8 +11,8 @@ function App(): JSX.Element {
     <Router>
       <Header />
       <Routes>
-        <Route path="/login" element={<LoginPage />} />
-        <Route path="/" element={<HomePage />} />
+        <Route path="/" element={<LoginPage />} />
+        <Route path="/login" element={<HomePage />} />
         <Route path="/teachers" element={<TeacherPage />} />
         <Route path="/students" element={<StudentPage />} />
       </Routes>

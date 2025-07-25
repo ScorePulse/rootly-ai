@@ -1,23 +1,29 @@
-import React, { useState, useEffect } from 'react';
-import teacherService from '../services/teacherService';
+import React, { useState, useEffect } from "react";
+import { getAllTeachers } from "../api";
 
-const TeacherPage = () => {
-  const [teachers, setTeachers] = useState([]);
+interface Teacher {
+  _id: string;
+  name: string;
+  email: string;
+}
+
+const TeacherPage: React.FC = () => {
+  const [teachers, setTeachers] = useState<Teacher[]>([]);
 
   useEffect(() => {
     const fetchTeachers = async () => {
       try {
-        const response = await teacherService.getAllTeachers();
+        const response = await getAllTeachers();
         setTeachers(response.data);
       } catch (error) {
-        console.error('Error fetching teachers:', error);
+        console.error("Error fetching teachers:", error);
       }
     };
     fetchTeachers();
   }, []);
 
   return (
-    <div>
+    <div className="container mx-auto p-4">
       <h1 className="text-3xl font-bold mb-4">Teachers</h1>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {teachers.map((teacher) => (
