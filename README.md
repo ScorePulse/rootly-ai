@@ -63,4 +63,4 @@ You can also run the application using Docker.
    ```bash
    docker-compose up --build
    ```
-This will start the frontend, backend, and a MongoDB instance.
+   This will start the frontend, backend, and a MongoDB instance
