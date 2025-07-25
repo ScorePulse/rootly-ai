@@ -1,7 +1,33 @@
-import React from "react";
-import { MdEmail, MdLock, MdRemoveRedEye } from "react-icons/md";
+import React, { useState } from "react";
+import { MdEmail, MdLock, MdRemoveRedEye, MdPerson } from "react-icons/md";
+import userService from "../services/userService";
 
 const LoginPage = () => {
+  const [isLogin, setIsLogin] = useState(true);
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [name, setName] = useState("");
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  const handleAuth = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    setError("");
+    try {
+      if (isLogin) {
+        await userService.login(email, password);
+        // Handle successful login, e.g., redirect to another page
+      } else {
+        await userService.register(name, email, password);
+        // Handle successful registration
+      }
+    } catch (err) {
+      setError(err.response?.data?.error || "An error occurred");
+    }
+    setLoading(false);
+  };
+
   return (
     <div className="min-h-screen bg-purple-700 flex flex-col items-center justify-center p-4">
       <div className="w-full max-w-sm p-6 space-y-6 bg-white rounded-xl shadow-lg">
@@ -16,15 +42,46 @@ const LoginPage = () => {
         </div>
 
         <div className="flex justify-around p-1 bg-gray-200 rounded-full">
-          <button className="w-full py-2 text-sm text-purple-700 bg-white rounded-full shadow">
+          <button
+            onClick={() => setIsLogin(true)}
+            className={`w-full py-2 text-sm ${
+              isLogin
+                ? "text-purple-700 bg-white rounded-full shadow"
+                : "text-gray-600"
+            }`}
+          >
             Login
           </button>
-          <button className="w-full py-2 text-sm text-gray-600">
+          <button
+            onClick={() => setIsLogin(false)}
+            className={`w-full py-2 text-sm ${
+              !isLogin
+                ? "text-purple-700 bg-white rounded-full shadow"
+                : "text-gray-600"
+            }`}
+          >
             Register
           </button>
         </div>
 
-        <form className="space-y-4">
+        <form className="space-y-4" onSubmit={handleAuth}>
+          {!isLogin && (
+            <div>
+              <label className="text-xs font-bold text-gray-600">Name</label>
+              <div className="relative">
+                <span className="absolute inset-y-0 left-0 flex items-center pl-3">
+                  <MdPerson className="text-gray-400" />
+                </span>
+                <input
+                  type="text"
+                  className="w-full py-2 pl-10 pr-3 text-sm border rounded-lg"
+                  placeholder="Enter your name"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                />
+              </div>
+            </div>
+          )}
           <div>
             <label className="text-xs font-bold text-gray-600">
               Email Address
@@ -36,7 +93,8 @@ const LoginPage = () => {
               <input
                 type="email"
                 className="w-full py-2 pl-10 pr-3 text-sm border rounded-lg"
-                defaultValue="divyashreec1@gmail.com"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
               />
             </div>
           </div>
@@ -51,12 +109,16 @@ const LoginPage = () => {
                 type="password"
                 placeholder="Enter your password"
                 className="w-full py-2 pl-10 pr-10 text-sm border rounded-lg"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
               />
               <span className="absolute inset-y-0 right-0 flex items-center pr-3">
                 <MdRemoveRedEye className="text-gray-400" />
               </span>
             </div>
           </div>
+
+          {error && <p className="text-xs text-red-500">{error}</p>}
 
           <div className="flex items-center justify-between text-xs">
             <div className="flex items-center">
@@ -74,8 +136,9 @@ const LoginPage = () => {
           <button
             type="submit"
             className="w-full py-2 font-bold text-white bg-purple-700 rounded-lg hover:bg-purple-800 text-sm"
+            disabled={loading}
           >
-            Sign In
+            {loading ? "Processing..." : isLogin ? "Sign In" : "Register"}
           </button>
 
           <button
