@@ -7,7 +7,6 @@ import {
 } from "react-icons/md";
 import { FcGoogle } from "react-icons/fc";
 import {
-  getAuth,
   signInWithEmailAndPassword,
   createUserWithEmailAndPassword,
   GoogleAuthProvider,
@@ -15,7 +14,7 @@ import {
 } from "firebase/auth";
 import { auth } from "../firebase";
 
-const LoginPage: React.FC = (): JSX.Element => {
+const LoginPage = () => {
   const [isLogin, setIsLogin] = useState<boolean>(true);
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
