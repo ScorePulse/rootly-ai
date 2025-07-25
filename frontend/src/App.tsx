@@ -12,7 +12,7 @@ function App(): JSX.Element {
       <Header />
       <Routes>
         <Route path="/" element={<LoginPage />} />
-        <Route path="/login" element={<HomePage />} />
+        <Route path="/home" element={<HomePage />} />
         <Route path="/teachers" element={<TeacherPage />} />
         <Route path="/students" element={<StudentPage />} />
       </Routes>

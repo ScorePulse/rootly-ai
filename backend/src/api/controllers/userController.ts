@@ -1,11 +1,12 @@
-const { auth, db } = require("../../config/firebase");
-const {
+import { Request, Response } from "express";
+import { auth, db } from "../../config/firebase";
+import {
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
-} = require("firebase/auth");
-const { doc, setDoc } = require("firebase/firestore");
+} from "firebase/auth";
+import { doc, setDoc } from "firebase/firestore";
 
-const registerUser = async (req, res) => {
+const registerUser = async (req: Request, res: Response) => {
   const { email, password, name } = req.body;
   try {
     const userCredential = await createUserWithEmailAndPassword(
@@ -22,13 +23,15 @@ const registerUser = async (req, res) => {
       message: "User registered successfully",
       userId: user.uid,
     });
-  } catch (error) {
+  } catch (error: any) {
     res.status(400).json({ error: error.message });
   }
 };
 
-const loginUser = async (req, res) => {
+const loginUser = async (req: Request, res: Response) => {
+  console.log("Login request received");
   const { email, password } = req.body;
+  console.log(`Email: ${email}, Password: ${password}`);
   try {
     const userCredential = await signInWithEmailAndPassword(
       auth,
@@ -40,12 +43,9 @@ const loginUser = async (req, res) => {
       message: "User logged in successfully",
       userId: user.uid,
     });
-  } catch (error) {
+  } catch (error: any) {
     res.status(401).json({ error: error.message });
   }
 };
 
-module.exports = {
-  registerUser,
-  loginUser,
-};
+export { registerUser, loginUser };

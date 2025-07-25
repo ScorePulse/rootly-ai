@@ -1,30 +1,31 @@
-import React, { useState, FormEvent } from "react";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { MdEmail, MdLock, MdRemoveRedEye, MdPerson } from "react-icons/md";
 import userService from "../services/userService";
 
-const LoginPage: React.FC = () => {
-  const [isLogin, setIsLogin] = useState<boolean>(true);
-  const [email, setEmail] = useState<string>("");
-  const [password, setPassword] = useState<string>("");
-  const [name, setName] = useState<string>("");
-  const [error, setError] = useState<string>("");
-  const [loading, setLoading] = useState<boolean>(false);
+const LoginPage = () => {
+  const [isLogin, setIsLogin] = useState(true);
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [name, setName] = useState("");
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
-  const handleAuth = async (e: FormEvent) => {
+  const handleAuth = async (e) => {
     e.preventDefault();
     setLoading(true);
     setError("");
     try {
       if (isLogin) {
+        console.log("Logging in...", email, password);
         await userService.login({ email, password });
         navigate("/home");
       } else {
         await userService.register({ name, email, password });
         setIsLogin(true);
       }
-    } catch (err: any) {
+    } catch (err) {
       setError(err.response?.data?.error || "An error occurred");
     }
     setLoading(false);

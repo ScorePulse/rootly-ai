@@ -1,12 +1,9 @@
-import React from 'react';
+import React from "react";
 
-const HomePage = () => {
+const HomePage: React.FC = () => {
   return (
-    <div className="text-center">
-      <h1 className="text-4xl font-bold mb-4">Welcome to the Education App</h1>
-      <p className="text-lg">
-        Manage your students and classrooms with ease.
-      </p>
+    <div className="min-h-screen flex items-center justify-center">
+      <h1 className="text-3xl font-bold">Welcome to rootly</h1>
     </div>
   );
 };
