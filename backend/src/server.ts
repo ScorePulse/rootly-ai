@@ -2,7 +2,6 @@ import dotenv from "dotenv";
 dotenv.config();
 import express, { Request, Response } from "express";
 import cors from "cors";
-import { auth, db, storage } from "./config/firebase";
 import userRoutes from "./api/routes/userRoutes";
 
 const app = express();
