@@ -27,7 +27,7 @@ const RegisterPage: React.FC = () => {
         email,
       });
       toast.success("Registered successfully!");
-      navigate("/home");
+      navigate("/user-profile");
     } catch (error) {
       toast.error("Failed to register.");
     }
