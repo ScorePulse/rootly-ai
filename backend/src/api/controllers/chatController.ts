@@ -1,17 +1,60 @@
 import { Request, Response } from "express";
+import { MasterPlannerAgent } from "../../agents/MasterPlannerAgent";
 
-const initialMessage = "Welcome to the chat! How can I help you today?";
-let isFirstMessage = true;
+// Instantiate your MasterPlannerAgent outside the controller function
+// so it's not re-created on every request, which is more efficient.
+const masterPlannerAgent = new MasterPlannerAgent();
+
+// Removed initialMessage and isFirstMessage as they conflict with a streaming endpoint.
+// If an initial welcome is needed, it should be sent as the first SSE chunk or handled on the client.
 
 export const chatController = async (req: Request, res: Response) => {
+  // Set headers for Server-Sent Events (SSE)
+  // This tells the client to expect a stream of events.
+  res.setHeader("Content-Type", "text/event-stream");
+  res.setHeader("Cache-Control", "no-cache");
+  res.setHeader("Connection", "keep-alive");
+  res.setHeader("X-Accel-Buffering", "no"); // Disable proxy buffering for Nginx/Apache, etc.
+
+  // Extract the message from the request body
   const { message } = req.body;
 
-  if (isFirstMessage) {
-    isFirstMessage = false;
-    return res.json({ reply: initialMessage });
+  // Basic validation for the message
+  if (!message) {
+    // Send an error message as an SSE data event and then end the stream
+    res
+      .status(400)
+      .write('data: {"error": "Missing message in request body"}\n\n');
+    res.end();
+    return;
   }
 
-  // Simple echo logic for demonstration
-  const reply = `You said: "${message}"`;
-  res.json({ reply });
+  try {
+    // Call the MasterPlannerAgent's run method, which now returns an AsyncGenerator (the stream)
+    const stream = await masterPlannerAgent.run(message);
+
+    // Iterate over the stream of chunks received from the Gemini API
+    for await (const chunk of stream) {
+      const chunkText = chunk.text; // Extract the text content from the current chunk
+
+      if (chunkText) {
+        // Send each piece of text as an SSE data event
+        // We stringify the content to handle potential special characters and for robust parsing on the client side.
+        res.write(`data: ${JSON.stringify({ content: chunkText })}\n\n`);
+      }
+    }
+
+    // Once the stream from the agent is complete, end the HTTP response
+    res.end();
+  } catch (error: any) {
+    console.error("Error in chatController streaming:", error);
+    // If an error occurs, send an SSE error event to the client
+    // This allows the client to gracefully handle errors during the stream.
+    res.write(
+      `event: error\ndata: ${JSON.stringify({
+        message: error.message || "An error occurred during chat streaming.",
+      })}\n\n`
+    );
+    res.end();
+  }
 };

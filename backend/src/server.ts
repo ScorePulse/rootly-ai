@@ -4,6 +4,7 @@ import express, { Request, Response } from "express";
 import cors from "cors";
 import userRoutes from "./api/routes/userRoutes";
 import chatRoutes from "./api/routes/chatRoutes";
+import { MasterPlannerAgent } from "./agents/MasterPlannerAgent";
 
 const app = express();
 

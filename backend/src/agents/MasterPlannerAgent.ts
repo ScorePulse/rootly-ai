@@ -1,4 +1,4 @@
-import { VertexAI } from "@google-cloud/vertexai";
+import { GoogleGenAI, GenerateContentResponse } from "@google/genai"; // Import GenerateContentResponse for typing
 import {
   GradesSyllabusContextAgent,
   StudentContextAgent,
@@ -7,27 +7,29 @@ import {
 
 // Agent interface (optional, but good practice)
 interface IAgent {
-  run(prompt: string): Promise<any>;
+  run(
+    prompt: string
+  ): Promise<AsyncGenerator<GenerateContentResponse, any, any>>; // Update return type
 }
 
 // Master Planner Agent
 export class MasterPlannerAgent implements IAgent {
-  private vertexAI: VertexAI;
+  private genAI: GoogleGenAI;
   private teacherContextAgent: TeacherContextAgent;
   private gradesSyllabusContextAgent: GradesSyllabusContextAgent;
   private studentContextAgent: StudentContextAgent;
 
   constructor() {
-    this.vertexAI = new VertexAI({
-      project: process.env.GOOGLE_PROJECT_ID || "",
-      location: process.env.GOOGLE_LOCATION || "",
-    });
+    this.genAI = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY! });
     this.teacherContextAgent = new TeacherContextAgent();
     this.gradesSyllabusContextAgent = new GradesSyllabusContextAgent();
     this.studentContextAgent = new StudentContextAgent();
   }
 
-  async run(prompt: string): Promise<any> {
+  // Changed the return type to Promise<AsyncGenerator<GenerateContentResponse, any, any>>
+  async run(
+    prompt: string
+  ): Promise<AsyncGenerator<GenerateContentResponse, any, any>> {
     // 1. Gather context from sub-agents
     const teacherContext = await this.teacherContextAgent.getContext();
     const gradesSyllabusContext =
@@ -48,19 +50,17 @@ export class MasterPlannerAgent implements IAgent {
       Based on all this information, generate a weekly plan.
     `;
 
-    // 3. Call the Gemini API
-    const generativeModel = this.vertexAI.getGenerativeModel({
-      model: "gemini-1.0-pro",
-    });
-
+    // 3. Call the Gemini API and return the stream
     try {
-      const result = await generativeModel.generateContent(fullPrompt);
-      const response = result.response;
-      const text = response.candidates?.[0]?.content?.parts?.[0]?.text;
-      return { plan: text };
+      const result = await this.genAI.models.generateContentStream({
+        model: "gemini-2.5-flash",
+        contents: [{ role: "user", parts: [{ text: fullPrompt }] }],
+      });
+      // Return the async generator directly
+      return result;
     } catch (error) {
       console.error("Error generating content from Gemini:", error);
-      throw new Error("Failed to generate lesson plan.");
+      throw new Error("Failed to initialize lesson plan stream.");
     }
   }
 
