@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import Select from "react-select";
 import {
   FiSettings,
@@ -10,6 +10,10 @@ import {
 interface Step2Props {
   nextStep: () => void;
   prevStep: () => void;
+  formData: any;
+  handleChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  handleSelectChange: (selectedOption: any, name: string) => void;
+  handleMultiSelectChange: (selectedOptions: any, name: string) => void;
 }
 
 const gradeOptions = [...Array(8)].map((_, i) => ({
@@ -51,42 +55,14 @@ const syllabusOptions = [
   { value: "state-board", label: "State Board" },
 ];
 
-const Step2: React.FC<Step2Props> = ({ nextStep, prevStep }) => {
-  const [formData, setFormData] = useState({
-    schoolName: "",
-    schoolType: "",
-    schoolMedium: "",
-    syllabus: "",
-    location: "",
-    schoolCapacity: "",
-    grades: [],
-    classroomCount: "",
-    classroomArea: "",
-    isSingleTeacherSchool: "",
-    staffCount: "",
-    amenities: [],
-    hasPlayground: "",
-  });
-
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
-  };
-
-  const handleSelectChange = (selectedOption: any, name: string) => {
-    setFormData((prev) => ({
-      ...prev,
-      [name]: selectedOption ? selectedOption.value : "",
-    }));
-  };
-
-  const handleMultiSelectChange = (selectedOptions: any, name: string) => {
-    setFormData((prev) => ({
-      ...prev,
-      [name]: selectedOptions ? selectedOptions.map((o: any) => o.value) : [],
-    }));
-  };
-
+const Step2: React.FC<Step2Props> = ({
+  nextStep,
+  prevStep,
+  formData,
+  handleChange,
+  handleSelectChange,
+  handleMultiSelectChange,
+}) => {
   return (
     <>
       <div className="text-center mb-6">
@@ -123,10 +99,11 @@ const Step2: React.FC<Step2Props> = ({ nextStep, prevStep }) => {
           </label>
           <input
             type="text"
+            id="schoolName"
             name="schoolName"
             value={formData.schoolName}
             onChange={handleChange}
-            className="w-full py-2 px-3 text-sm border rounded-lg"
+            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-purple-500 focus:border-purple-500"
             placeholder="Enter school name"
           />
         </div>
@@ -139,8 +116,12 @@ const Step2: React.FC<Step2Props> = ({ nextStep, prevStep }) => {
           <Select
             name="schoolType"
             options={schoolTypeOptions}
+            value={schoolTypeOptions.find(
+              (option) => option.value === formData.schoolType
+            )}
             onChange={(option) => handleSelectChange(option, "schoolType")}
-            placeholder="Select school type"
+            className="react-select-container"
+            classNamePrefix="react-select"
           />
         </div>
 
@@ -152,8 +133,12 @@ const Step2: React.FC<Step2Props> = ({ nextStep, prevStep }) => {
           <Select
             name="schoolMedium"
             options={schoolMediumOptions}
+            value={schoolMediumOptions.find(
+              (option) => option.value === formData.schoolMedium
+            )}
             onChange={(option) => handleSelectChange(option, "schoolMedium")}
-            placeholder="Select school medium"
+            className="react-select-container"
+            classNamePrefix="react-select"
           />
         </div>
 
@@ -165,8 +150,12 @@ const Step2: React.FC<Step2Props> = ({ nextStep, prevStep }) => {
           <Select
             name="syllabus"
             options={syllabusOptions}
+            value={syllabusOptions.find(
+              (option) => option.value === formData.syllabus
+            )}
             onChange={(option) => handleSelectChange(option, "syllabus")}
-            placeholder="e.g., CBSC, State Board"
+            className="react-select-container"
+            classNamePrefix="react-select"
           />
         </div>
 
@@ -177,10 +166,11 @@ const Step2: React.FC<Step2Props> = ({ nextStep, prevStep }) => {
           </label>
           <input
             type="text"
+            id="location"
             name="location"
             value={formData.location}
             onChange={handleChange}
-            className="w-full py-2 px-3 text-sm border rounded-lg"
+            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-purple-500 focus:border-purple-500"
             placeholder="Enter location"
           />
         </div>
@@ -192,10 +182,11 @@ const Step2: React.FC<Step2Props> = ({ nextStep, prevStep }) => {
           </label>
           <input
             type="number"
+            id="schoolCapacity"
             name="schoolCapacity"
             value={formData.schoolCapacity}
             onChange={handleChange}
-            className="w-full py-2 px-3 text-sm border rounded-lg"
+            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-purple-500 focus:border-purple-500"
             placeholder="Enter number"
           />
         </div>
@@ -209,9 +200,12 @@ const Step2: React.FC<Step2Props> = ({ nextStep, prevStep }) => {
             isMulti
             name="grades"
             options={gradeOptions}
-            className="basic-multi-select"
-            classNamePrefix="select"
+            value={gradeOptions.filter((option) =>
+              formData.grades.includes(option.value)
+            )}
             onChange={(options) => handleMultiSelectChange(options, "grades")}
+            className="react-select-container"
+            classNamePrefix="react-select"
           />
         </div>
 
@@ -222,10 +216,11 @@ const Step2: React.FC<Step2Props> = ({ nextStep, prevStep }) => {
           </label>
           <input
             type="number"
+            id="classroomCount"
             name="classroomCount"
             value={formData.classroomCount}
             onChange={handleChange}
-            className="w-full py-2 px-3 text-sm border rounded-lg"
+            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-purple-500 focus:border-purple-500"
             placeholder="Enter number"
           />
         </div>
@@ -237,10 +232,11 @@ const Step2: React.FC<Step2Props> = ({ nextStep, prevStep }) => {
           </label>
           <input
             type="number"
+            id="classroomArea"
             name="classroomArea"
             value={formData.classroomArea}
             onChange={handleChange}
-            className="w-full py-2 px-3 text-sm border rounded-lg"
+            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-purple-500 focus:border-purple-500"
             placeholder="Enter area"
           />
         </div>
@@ -253,10 +249,14 @@ const Step2: React.FC<Step2Props> = ({ nextStep, prevStep }) => {
           <Select
             name="isSingleTeacherSchool"
             options={singleTeacherSchoolOptions}
+            value={singleTeacherSchoolOptions.find(
+              (option) => option.value === formData.isSingleTeacherSchool
+            )}
             onChange={(option) =>
               handleSelectChange(option, "isSingleTeacherSchool")
             }
-            placeholder="Select"
+            className="react-select-container"
+            classNamePrefix="react-select"
           />
         </div>
 
@@ -267,10 +267,11 @@ const Step2: React.FC<Step2Props> = ({ nextStep, prevStep }) => {
           </label>
           <input
             type="number"
+            id="staffCount"
             name="staffCount"
             value={formData.staffCount}
             onChange={handleChange}
-            className="w-full py-2 px-3 text-sm border rounded-lg"
+            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-purple-500 focus:border-purple-500"
             placeholder="Enter number"
           />
         </div>
@@ -284,11 +285,14 @@ const Step2: React.FC<Step2Props> = ({ nextStep, prevStep }) => {
             isMulti
             name="amenities"
             options={amenityOptions}
-            className="basic-multi-select"
-            classNamePrefix="select"
+            value={amenityOptions.filter((option) =>
+              formData.amenities.includes(option.value)
+            )}
             onChange={(options) =>
               handleMultiSelectChange(options, "amenities")
             }
+            className="react-select-container"
+            classNamePrefix="react-select"
           />
         </div>
 
@@ -300,8 +304,12 @@ const Step2: React.FC<Step2Props> = ({ nextStep, prevStep }) => {
           <Select
             name="hasPlayground"
             options={playgroundAvailableOptions}
+            value={playgroundAvailableOptions.find(
+              (option) => option.value === formData.hasPlayground
+            )}
             onChange={(option) => handleSelectChange(option, "hasPlayground")}
-            placeholder="Select"
+            className="react-select-container"
+            classNamePrefix="react-select"
           />
         </div>
       </form>

@@ -4,17 +4,29 @@ import StarRating from "../../components/StarRating";
 interface Step3Props {
   nextStep: () => void;
   prevStep: () => void;
+  formData: any;
+  setRating: (name: string, rating: number) => void;
+  handleAddLanguage: (language: string) => void;
+  handleChange: (
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
+    >
+  ) => void;
 }
 
-const Step3: React.FC<Step3Props> = ({ nextStep, prevStep }) => {
-  const [languages, setLanguages] = useState<string[]>([]);
+const Step3: React.FC<Step3Props> = ({
+  nextStep,
+  prevStep,
+  formData,
+  setRating,
+  handleAddLanguage,
+  handleChange,
+}) => {
   const [currentLanguage, setCurrentLanguage] = useState("");
-  const [languageProficiency, setLanguageProficiency] = useState(0);
-  const [teachingStrength, setTeachingStrength] = useState(0);
 
-  const handleAddLanguage = () => {
+  const handleAddLanguageClick = () => {
     if (currentLanguage.trim() !== "") {
-      setLanguages([...languages, currentLanguage.trim()]);
+      handleAddLanguage(currentLanguage.trim());
       setCurrentLanguage("");
     }
   };
@@ -40,6 +52,9 @@ const Step3: React.FC<Step3Props> = ({ nextStep, prevStep }) => {
           <input
             type="text"
             id="name"
+            name="name"
+            value={formData.name}
+            onChange={handleChange}
             className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-purple-500 focus:border-purple-500"
           />
         </div>
@@ -59,14 +74,14 @@ const Step3: React.FC<Step3Props> = ({ nextStep, prevStep }) => {
             />
             <button
               type="button"
-              onClick={handleAddLanguage}
+              onClick={handleAddLanguageClick}
               className="px-4 py-2 bg-purple-600 text-white rounded-r-lg hover:bg-purple-700"
             >
               Add
             </button>
           </div>
           <div className="mt-2">
-            {languages.map((lang, index) => (
+            {formData.languages.map((lang: string, index: number) => (
               <span
                 key={index}
                 className="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2"
@@ -81,8 +96,8 @@ const Step3: React.FC<Step3Props> = ({ nextStep, prevStep }) => {
             Language Proficiency Level
           </label>
           <StarRating
-            rating={languageProficiency}
-            setRating={setLanguageProficiency}
+            rating={formData.languageProficiency}
+            setRating={(rating) => setRating("languageProficiency", rating)}
           />
         </div>
         <div className="mb-4">
@@ -95,6 +110,9 @@ const Step3: React.FC<Step3Props> = ({ nextStep, prevStep }) => {
           <input
             type="text"
             id="qualification"
+            name="qualification"
+            value={formData.qualification}
+            onChange={handleChange}
             className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-purple-500 focus:border-purple-500"
           />
         </div>
@@ -103,35 +121,22 @@ const Step3: React.FC<Step3Props> = ({ nextStep, prevStep }) => {
             Teaching Strength
           </label>
           <StarRating
-            rating={teachingStrength}
-            setRating={setTeachingStrength}
-          />
-        </div>
-        <div className="mb-4">
-          <label
-            htmlFor="experience"
-            className="block text-sm font-medium text-gray-700 mb-1"
-          >
-            Experience (Years)
-          </label>
-          <input
-            type="number"
-            id="experience"
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-purple-500 focus:border-purple-500"
+            rating={formData.teachingStrength}
+            setRating={(rating) => setRating("teachingStrength", rating)}
           />
         </div>
         <div className="flex justify-between mt-6">
           <button
             type="button"
             onClick={prevStep}
-            className="px-6 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-100"
+            className="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300"
           >
             Back
           </button>
           <button
             type="button"
             onClick={nextStep}
-            className="px-6 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700"
+            className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700"
           >
             Next
           </button>

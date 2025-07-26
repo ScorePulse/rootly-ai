@@ -4,7 +4,7 @@ import {
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
 } from "firebase/auth";
-import { doc, setDoc } from "firebase/firestore";
+import { doc, setDoc, getDoc } from "firebase/firestore";
 
 const registerUser = async (req: Request, res: Response) => {
   const { email, password, name } = req.body;
@@ -48,4 +48,23 @@ const loginUser = async (req: Request, res: Response) => {
   }
 };
 
-export { registerUser, loginUser };
+const updateUserProfile = async (req: Request, res: Response) => {
+  const { uid } = req.params;
+  const data = req.body;
+
+  try {
+    const userRef = doc(db, "users", uid);
+    const userDoc = await getDoc(userRef);
+
+    if (!userDoc.exists()) {
+      return res.status(404).json({ error: "User not found" });
+    }
+
+    await setDoc(userRef, data, { merge: true });
+    res.status(200).json({ message: "User profile updated successfully" });
+  } catch (error: any) {
+    res.status(400).json({ error: error.message });
+  }
+};
+
+export { registerUser, loginUser, updateUserProfile };

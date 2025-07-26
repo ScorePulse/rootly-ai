@@ -2,7 +2,11 @@ import express, { Request, Response, NextFunction } from "express";
 import asyncHandler from "express-async-handler";
 import { auth, db } from "../../config/admin";
 import { DecodedIdToken } from "firebase-admin/auth";
-import { loginUser, registerUser } from "../controllers/userController";
+import {
+  loginUser,
+  registerUser,
+  updateUserProfile,
+} from "../controllers/userController";
 
 const router = express.Router();
 
@@ -26,6 +30,8 @@ const authMiddleware = asyncHandler(
 
 router.post("/login", loginUser);
 router.post("/register", registerUser);
+
+router.put("/profile/:uid", authMiddleware, updateUserProfile);
 
 router.post(
   "/create",
