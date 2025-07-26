@@ -17,6 +17,7 @@ import PlanPage from "./pages/PlanPage";
 import SettingsPage from "./pages/SettingsPage";
 import ProtectedRoute from "./components/ProtectedRoute";
 import BottomNav from "./components/BottomNav";
+import UserProfileLayout from "./pages/UserProfile/UserProfileLayout";
 
 function App(): JSX.Element {
   return (
@@ -50,6 +51,17 @@ const AppRoutes: React.FC = () => {
           path="/register"
           element={currentUser ? <Navigate to="/home" /> : <RegisterPage />}
         />
+        <Route
+          path="/user-profile"
+          element={
+            currentUser ? (
+              <UserProfileLayout />
+            ) : (
+              <Navigate to="/login" replace />
+            )
+          }
+        />
+
         <Route
           path="/"
           element={
