@@ -36,8 +36,60 @@ const UserProfileLayout: React.FC = () => {
     teachingStrength: 0,
   });
 
+  const validateForm = () => {
+    const requiredFieldsStep2 = [
+      "schoolName",
+      "schoolType",
+      "schoolMedium",
+      "syllabus",
+      "location",
+      "schoolCapacity",
+      "classroomCount",
+      "classroomArea",
+      "isSingleTeacherSchool",
+      "staffCount",
+      "hasPlayground",
+    ];
+    const requiredFieldsStep3 = ["name", "qualification"];
+
+    const allRequiredFields = [...requiredFieldsStep2, ...requiredFieldsStep3];
+
+    for (const field of allRequiredFields) {
+      if (!formData[field as keyof typeof formData]) {
+        toast.error(`Please fill out the ${field} field.`);
+        return false;
+      }
+    }
+
+    if (formData.grades.length === 0) {
+      toast.error("Please select at least one grade.");
+      return false;
+    }
+    if (formData.amenities.length === 0) {
+      toast.error("Please select at least one amenity.");
+      return false;
+    }
+    if (formData.languages.length === 0) {
+      toast.error("Please add at least one language.");
+      return false;
+    }
+    if (formData.languageProficiency === 0) {
+      toast.error("Please rate your language proficiency.");
+      return false;
+    }
+    if (formData.teachingStrength === 0) {
+      toast.error("Please rate your teaching strength.");
+      return false;
+    }
+
+    return true;
+  };
+
   const nextStep = async () => {
     if (step === 3) {
+      if (!validateForm()) {
+        return;
+      }
       if (!currentUser) {
         toast.error("You must be logged in to update your profile.");
         return;
@@ -90,7 +142,9 @@ const UserProfileLayout: React.FC = () => {
   };
 
   const onDone = () => {
-    navigate("/home");
+    if (validateForm()) {
+      navigate("/home");
+    }
   };
 
   const renderStep = () => {
