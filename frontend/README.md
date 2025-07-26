@@ -14,11 +14,13 @@ This directory contains the frontend of the Rootly education application, built 
 ## Setup and Installation
 
 1.  **Navigate to the frontend directory:**
+
     ```bash
     cd frontend
     ```
 
 2.  **Install dependencies:**
+
     ```bash
     npm install
     ```
@@ -38,8 +40,36 @@ This directory contains the frontend of the Rootly education application, built 
     VITE_FIREBASE_APP_ID="your-app-id"
     ```
 
+## Application Workflow
+
+This application uses a robust, context-based approach to manage authentication and routing.
+
+### 1. Authentication & Routing
+
+- **Initial Load:** When a user opens the application, their authentication status is checked.
+  - If the user is **logged in**, they are automatically routed to the Home Page (`/`).
+  - If the user is **not logged in**, they are routed to the Login Page (`/login`).
+- **Login Page (`/login`):** This is the landing page for unauthenticated users. From here, a user can either log in with existing credentials or switch to the registration form to create a new account.
+- **Protected Routes:** All pages except for the Login Page are protected. If an unauthenticated user tries to access a protected page, they will be redirected to the Login Page.
+
+### 2. Available Routes
+
+- `/`:Landing page for the application.
+- `/home`: The main dashboard or home page for logged-in users.
+- `/login`: The login page (sign in).
+- `/register`: The new user register page ( sign up).
+- `/schedule`: The schedule page (Protected).
+- `/plan`: The plan page (Protected).
+- `/students`: The students page (Protected).
+- `/setting`: The settings page (Protected).
+
+### 3. User Data Flow
+
+- **Centralized State:** The authentication state is managed globally by the `AuthContext` (`src/context/AuthContext.tsx`). This provides the current user's information to all components.
+- **User Creation:** When a user registers, their account is created in Firebase Authentication on the client side. Immediately after, a request is sent to the backend with the user's ID token. The backend verifies this token and creates a corresponding user document in the Firestore database.
+
 ## Available Scripts
 
--   **`npm run dev`**: Starts the development server with hot reloading.
--   **`npm run build`**: Compiles the TypeScript and React code into production-ready JavaScript files.
--   **`npm run preview`**: Starts a local server to preview the production build.
+- **`npm run dev`**: Starts the development server with hot reloading.
+- **`npm run build`**: Compiles the TypeScript and React code into production-ready JavaScript files.
+- **`npm run preview`**: Starts a local server to preview the production build.

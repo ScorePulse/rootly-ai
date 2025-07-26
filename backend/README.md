@@ -14,11 +14,13 @@ This directory contains the backend of the Rootly education application, built w
 ## Setup and Installation
 
 1.  **Navigate to the backend directory:**
+
     ```bash
     cd backend
     ```
 
 2.  **Install dependencies:**
+
     ```bash
     npm install
     ```
@@ -45,6 +47,19 @@ This directory contains the backend of the Rootly education application, built w
 
 ## Available Scripts
 
--   **`npm run dev`**: Starts the development server with `nodemon` and `ts-node` for hot reloading.
--   **`npm run build`**: Compiles the TypeScript code into JavaScript, outputting it to the `dist` directory.
--   **`npm run start`**: Starts the production server by running the compiled JavaScript from the `dist` directory.
+- **`npm run dev`**: Starts the development server with `nodemon` and `ts-node` for hot reloading.
+- **`npm run build`**: Compiles the TypeScript code into JavaScript, outputting it to the `dist` directory.
+- **`npm run start`**: Starts the production server by running the compiled JavaScript from the `dist` directory.
+
+## firestore Data base Collection available
+
+- users: list of user profile. (Basically teachers are the users of the application).
+  schema of the users is
+
+  ````{
+
+      }```
+
+  ````
+
+- students: list of students assigned to the teacher.
