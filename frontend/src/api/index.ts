@@ -38,4 +38,23 @@ export const updateTeacher = (id: string, data: any) =>
   api.put(`/teachers/${id}`, data);
 export const deleteTeacher = (id: string) => api.delete(`/teachers/${id}`);
 
+const API_URL = "http://localhost:5000/api";
+
+export const sendMessage = async (message: string): Promise<string> => {
+  const response = await fetch(`${API_URL}/chat/chat`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ message }),
+  });
+
+  if (!response.ok) {
+    throw new Error("Failed to send message");
+  }
+
+  const data = await response.json();
+  return data.reply;
+};
+
 export default api;
