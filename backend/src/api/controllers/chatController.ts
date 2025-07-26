@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 import { MasterPlannerAgent } from "../../agents/MasterPlannerAgent";
+import { sendMessage } from "../../agents";
 
 // Instantiate your MasterPlannerAgent outside the controller function
 // so it's not re-created on every request, which is more efficient.
@@ -31,18 +32,9 @@ export const chatController = async (req: Request, res: Response) => {
 
   try {
     // Call the MasterPlannerAgent's run method, which now returns an AsyncGenerator (the stream)
-    const stream = await masterPlannerAgent.run(message);
+    const stream = await sendMessage(message);
 
-    // Iterate over the stream of chunks received from the Gemini API
-    for await (const chunk of stream) {
-      const chunkText = chunk.text; // Extract the text content from the current chunk
-
-      if (chunkText) {
-        // Send each piece of text as an SSE data event
-        // We stringify the content to handle potential special characters and for robust parsing on the client side.
-        res.write(`data: ${JSON.stringify({ content: chunkText })}\n\n`);
-      }
-    }
+    res.json({ result: stream });
 
     // Once the stream from the agent is complete, end the HTTP response
     res.end();
