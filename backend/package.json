@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "Backend for the education application",
   "main": "dist/server.js",
+  "type": "module",
   "scripts": {
     "start": "node dist/server.js",
     "build": "tsc",
