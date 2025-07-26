@@ -4,13 +4,14 @@ import express, { Request, Response } from "express";
 import cors from "cors";
 import userRoutes from "./api/routes/userRoutes";
 import chatRoutes from "./api/routes/chatRoutes";
-import { MasterPlannerAgent } from "./agents/MasterPlannerAgent";
+import loggingMiddleware from "./middleware/loggingMiddleware";
 
 const app = express();
 
 // Middleware
 app.use(cors());
 app.use(express.json());
+app.use(loggingMiddleware);
 
 // Health check route
 app.get("/health", (req: Request, res: Response) => {
