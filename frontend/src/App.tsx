@@ -16,7 +16,7 @@ import SchedulePage from "./pages/SchedulePage";
 import PlanPage from "./pages/PlanPage";
 import SettingsPage from "./pages/SettingsPage";
 import ProtectedRoute from "./components/ProtectedRoute";
-import UserProfileLayout from "./pages/UserProfile/UserProfileLayout";
+import BottomNav from "./components/BottomNav";
 
 function App(): JSX.Element {
   return (
@@ -38,72 +38,69 @@ const AppRoutes: React.FC = () => {
   }
 
   return (
-    <Routes>
-      <Route
-        path="/login"
-        element={currentUser ? <Navigate to="/home" /> : <LoginPage />}
-      />
-      <Route
-        path="/register"
-        element={currentUser ? <Navigate to="/home" /> : <RegisterPage />}
-      />
-      <Route
-        path="/"
-        element={
-          <ProtectedRoute>
-            <HomePage />
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/user-profile"
-        element={
-          <ProtectedRoute>
-            <UserProfileLayout />
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/home"
-        element={
-          <ProtectedRoute>
-            <HomePage />
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/schedule"
-        element={
-          <ProtectedRoute>
-            <SchedulePage />
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/plan"
-        element={
-          <ProtectedRoute>
-            <PlanPage />
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/students"
-        element={
-          <ProtectedRoute>
-            <StudentPage />
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/setting"
-        element={
-          <ProtectedRoute>
-            <SettingsPage />
-          </ProtectedRoute>
-        }
-      />
-    </Routes>
+    <div className="pb-16">
+      {" "}
+      {/* Add padding to the bottom to avoid content being hidden by the nav bar */}
+      <Routes>
+        <Route
+          path="/login"
+          element={currentUser ? <Navigate to="/home" /> : <LoginPage />}
+        />
+        <Route
+          path="/register"
+          element={currentUser ? <Navigate to="/home" /> : <RegisterPage />}
+        />
+        <Route
+          path="/"
+          element={
+            <ProtectedRoute>
+              <HomePage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/home"
+          element={
+            <ProtectedRoute>
+              <HomePage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/schedule"
+          element={
+            <ProtectedRoute>
+              <SchedulePage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/plan"
+          element={
+            <ProtectedRoute>
+              <PlanPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/students"
+          element={
+            <ProtectedRoute>
+              <StudentPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/setting"
+          element={
+            <ProtectedRoute>
+              <SettingsPage />
+            </ProtectedRoute>
+          }
+        />
+      </Routes>
+      {currentUser && <BottomNav />}
+    </div>
   );
 };
 

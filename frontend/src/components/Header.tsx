@@ -25,7 +25,7 @@ const Header = () => {
   }
 
   return (
-    <header className="bg-purple-700 text-white p-4">
+    <header className="bg-purple-700 text-white p-4 sticky top-0 z-10">
       <div className="container mx-auto flex justify-between items-center">
         <h1 className="text-xl sm:text-2xl font-bold">
           <Link to="/home">Rootly</Link>
