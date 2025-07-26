@@ -36,6 +36,7 @@ The application includes the following routes:
 - `/`: Landing page.
 - `/home`: Main dashboard for logged-in users.
 - `/login`: Login page.
+- `/user-profile`: page that will be rendered when user successfully registers.
 - `/register`: New user registration page.
 - `/schedule`: Schedule page (Protected).
 - `/plan`: Plan page (Protected).
@@ -47,3 +48,4 @@ The application includes the following routes:
 - **Centralized State**: The `AuthContext` (`src/context/AuthContext.tsx`) centrally manages the authentication state, providing user information to all components.
 - **User Creation**: Upon registration, a user account is created in Firebase Authentication on the client side. Subsequently, an ID token is sent to the backend for verification, leading to the creation of a corresponding user document in the Firestore database.
 - **User Login**: When a user signs in, Firebase authentication handles the process on the client side, and the `AuthContext` stores the user's details.
+- **user profile**: when a user successfully registers hel be routed to user-profile, where he/she will be taken through 5 steps

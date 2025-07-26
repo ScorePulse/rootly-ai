@@ -16,6 +16,7 @@ import SchedulePage from "./pages/SchedulePage";
 import PlanPage from "./pages/PlanPage";
 import SettingsPage from "./pages/SettingsPage";
 import ProtectedRoute from "./components/ProtectedRoute";
+import UserProfileLayout from "./pages/UserProfile/UserProfileLayout";
 
 function App(): JSX.Element {
   return (
@@ -51,6 +52,14 @@ const AppRoutes: React.FC = () => {
         element={
           <ProtectedRoute>
             <HomePage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/user-profile"
+        element={
+          <ProtectedRoute>
+            <UserProfileLayout />
           </ProtectedRoute>
         }
       />
