@@ -25,6 +25,18 @@ export const createUserDocument = (userData: {
   return api.post("/users/create", userData);
 };
 
+export const updateUserProfile = (uid: string, data: any) => {
+  return api.put(`/users/profile/${uid}`, data);
+};
+
+export const completeUserRegistration = (uid: string) => {
+  return api.put(`/users/complete-registration/${uid}`);
+};
+
+export const completeUserProfile = (uid: string) => {
+  return api.put(`/users/complete-profile/${uid}`);
+};
+
 // Student API
 export const getAllStudents = () => api.get("/students");
 export const getStudentById = (id: string) => api.get(`/students/${id}`);

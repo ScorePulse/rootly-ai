@@ -1,5 +1,5 @@
 import { auth } from "../firebase";
-import api from "../api";
+import { updateUserProfile as updateProfile } from "../api";
 
 export const updateUserProfile = async (data: any) => {
   const user = auth.currentUser;
@@ -7,12 +7,6 @@ export const updateUserProfile = async (data: any) => {
     throw new Error("No user is signed in.");
   }
 
-  const token = await user.getIdToken();
-  const response = await api.put(`/users/profile/${user.uid}`, data, {
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-  });
-
+  const response = await updateProfile(user.uid, data);
   return response.data;
 };

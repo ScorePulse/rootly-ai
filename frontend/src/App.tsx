@@ -32,11 +32,23 @@ function App(): JSX.Element {
 }
 
 const AppRoutes: React.FC = () => {
-  const { currentUser, loading } = useContext(AuthContext);
+  const { currentUser, userData, loading } = useContext(AuthContext);
 
   if (loading) {
     return <div>Loading...</div>;
   }
+
+  // Debug logging
+  console.log("AppRoutes - currentUser:", currentUser?.uid);
+  console.log("AppRoutes - userData:", userData);
+  console.log("AppRoutes - loading:", loading);
+
+  // Route logic based on user state:
+  // 1. No currentUser -> redirect to login
+  // 2. Has currentUser but no userData -> redirect to login (user doc doesn't exist)
+  // 3. Has userData but isRegistered=false -> redirect to login (shouldn't happen with new flow)
+  // 4. Has userData, isRegistered=true but isProfileComplete=false -> redirect to user-profile
+  // 5. Has userData, isRegistered=true and isProfileComplete=true -> allow access to protected routes
 
   return (
     <div className="pb-16">
@@ -45,17 +57,49 @@ const AppRoutes: React.FC = () => {
       <Routes>
         <Route
           path="/login"
-          element={currentUser ? <Navigate to="/home" /> : <LoginPage />}
+          element={
+            currentUser &&
+            userData?.isRegistered &&
+            userData?.isProfileComplete ? (
+              <Navigate to="/home" />
+            ) : (
+              <LoginPage />
+            )
+          }
         />
         <Route
           path="/register"
-          element={currentUser ? <Navigate to="/home" /> : <RegisterPage />}
+          element={
+            currentUser &&
+            userData?.isRegistered &&
+            userData?.isProfileComplete ? (
+              <Navigate to="/home" />
+            ) : currentUser &&
+              userData?.isRegistered &&
+              !userData?.isProfileComplete ? (
+              <Navigate to="/user-profile" />
+            ) : (
+              <RegisterPage />
+            )
+          }
         />
         <Route
           path="/user-profile"
           element={
             currentUser ? (
-              <UserProfileLayout />
+              userData ? (
+                userData.isRegistered ? (
+                  userData.isProfileComplete ? (
+                    <Navigate to="/home" replace />
+                  ) : (
+                    <UserProfileLayout />
+                  )
+                ) : (
+                  <Navigate to="/login" replace />
+                )
+              ) : (
+                <Navigate to="/login" replace />
+              )
             ) : (
               <Navigate to="/login" replace />
             )
@@ -111,7 +155,9 @@ const AppRoutes: React.FC = () => {
           }
         />
       </Routes>
-      {currentUser && <BottomNav />}
+      {currentUser && userData?.isRegistered && userData?.isProfileComplete && (
+        <BottomNav />
+      )}
     </div>
   );
 };

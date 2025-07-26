@@ -6,6 +6,8 @@ import {
   loginUser,
   registerUser,
   updateUserProfile,
+  completeRegistration,
+  completeProfile,
 } from "../controllers/userController";
 
 const router = express.Router();
@@ -32,6 +34,8 @@ router.post("/login", loginUser);
 router.post("/register", registerUser);
 
 router.put("/profile/:uid", authMiddleware, updateUserProfile);
+router.put("/complete-registration/:uid", authMiddleware, completeRegistration);
+router.put("/complete-profile/:uid", authMiddleware, completeProfile);
 
 router.post(
   "/create",

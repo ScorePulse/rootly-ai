@@ -4,13 +4,14 @@ import Step2 from "./Step2";
 import Step3 from "./Step3";
 import Step4 from "./Step4";
 import { updateUserProfile } from "../../services/userService";
+import { completeUserProfile } from "../../api";
 import { AuthContext } from "../../context/AuthContext";
 import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
 
 const UserProfileLayout: React.FC = () => {
   const [step, setStep] = useState(1);
-  const { currentUser } = useContext(AuthContext);
+  const { currentUser, refreshUserData } = useContext(AuthContext);
   const navigate = useNavigate();
 
   const [formData, setFormData] = useState({
@@ -141,9 +142,27 @@ const UserProfileLayout: React.FC = () => {
     }));
   };
 
-  const onDone = () => {
-    if (validateForm()) {
+  const onDone = async () => {
+    if (!validateForm()) {
+      return;
+    }
+
+    if (!currentUser) {
+      toast.error("You must be logged in to complete profile.");
+      return;
+    }
+
+    try {
+      // Mark the user profile as complete
+      await completeUserProfile(currentUser.uid);
+
+      // Refresh user data to get the updated isProfileComplete status
+      await refreshUserData();
+
+      toast.success("Profile completed successfully!");
       navigate("/home");
+    } catch (error) {
+      toast.error("Failed to complete profile. Please try again.");
     }
   };
 
