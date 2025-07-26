@@ -1,75 +1,49 @@
-# Frontend Application
-
-This directory contains the frontend of the Rootly education application, built with React, Vite, and TypeScript.
+This document describes the frontend application for the Rootly education platform, built with React, Vite, and TypeScript.
 
 ## Technologies Used
 
-- **React:** A JavaScript library for building user interfaces.
-- **Vite:** A fast build tool and development server.
-- **TypeScript:** A typed superset of JavaScript that compiles to plain JavaScript.
-- **Tailwind CSS:** A utility-first CSS framework for rapid UI development.
-- **Firebase:** Used for client-side authentication.
-- **React Hot Toast:** For user-friendly notifications.
+The frontend application leverages several key technologies:
+
+- **React**: A JavaScript library for building user interfaces.
+- **Vite**: A fast build tool and development server.
+- **TypeScript**: A typed superset of JavaScript.
+- **Tailwind CSS**: A utility-first CSS framework for rapid UI development.
+- **Firebase**: Used for client-side authentication.
+- **React Hot Toast**: For user-friendly notifications.
 
 ## Setup and Installation
 
-1.  **Navigate to the frontend directory:**
+To set up and run the application:
 
-    ```bash
-    cd frontend
-    ```
-
-2.  **Install dependencies:**
-
-    ```bash
-    npm install
-    ```
-
-3.  **Create an environment file:**
-    Create a `.env` file in the `frontend` directory and add the following variables. These are required to connect to the backend and Firebase.
-
-    ```env
-    VITE_API_URL=http://localhost:5000/api
-
-    # Firebase Client SDK Credentials
-    VITE_FIREBASE_API_KEY="your-api-key"
-    VITE_FIREBASE_AUTH_DOMAIN="your-auth-domain"
-    VITE_FIREBASE_PROJECT_ID="your-project-id"
-    VITE_FIREBASE_STORAGE_BUCKET="your-storage-bucket"
-    VITE_FIREBASE_MESSAGING_SENDER_ID="your-messaging-sender-id"
-    VITE_FIREBASE_APP_ID="your-app-id"
-    ```
+1.  Navigate into the `frontend` directory using `cd frontend`.
+2.  Install dependencies with `npm install`.
+3.  Create a `.env` file in the `frontend` directory and populate it with the `VITE_API_URL` for the backend connection, along with Firebase client SDK credentials (API key, auth domain, project ID, storage bucket, messaging sender ID, and app ID).
 
 ## Application Workflow
 
-This application uses a robust, context-based approach to manage authentication and routing.
+The application employs a context-based approach for authentication and routing.
 
-### 1. Authentication & Routing
+### Authentication & Routing
 
-- **Initial Load:** When a user opens the application, their authentication status is checked.
-  - If the user is **logged in**, they are automatically routed to the Home Page (`/`).
-  - If the user is **not logged in**, they are routed to the Login Page (`/login`).
-- **Login Page (`/login`):** This is the landing page for unauthenticated users. From here, a user can either log in with existing credentials or switch to the registration form to create a new account.
-- **Protected Routes:** All pages except for the Login Page are protected. If an unauthenticated user tries to access a protected page, they will be redirected to the Login Page.
+- **Initial Load**: Upon opening, the application checks the user's authentication status. Logged-in users are routed to the Home Page (`/`), while unauthenticated users are directed to the Login Page (`/login`).
+- **Login Page (`/login`)**: This serves as the landing page for unauthenticated users, allowing them to log in or switch to the registration form.
+- **Protected Routes**: All routes, except for the Login Page, are protected. Attempts by unauthenticated users to access protected pages will result in a redirection to the Login Page.
 
-### 2. Available Routes
+### Available Routes
 
-- `/`:Landing page for the application.
-- `/home`: The main dashboard or home page for logged-in users.
-- `/login`: The login page (sign in).
-- `/register`: The new user register page ( sign up).
-- `/schedule`: The schedule page (Protected).
-- `/plan`: The plan page (Protected).
-- `/students`: The students page (Protected).
-- `/setting`: The settings page (Protected).
+The application includes the following routes:
 
-### 3. User Data Flow
+- `/`: Landing page.
+- `/home`: Main dashboard for logged-in users.
+- `/login`: Login page.
+- `/register`: New user registration page.
+- `/schedule`: Schedule page (Protected).
+- `/plan`: Plan page (Protected).
+- `/students`: Students page (Protected).
+- `/setting`: Settings page (Protected).
 
-- **Centralized State:** The authentication state is managed globally by the `AuthContext` (`src/context/AuthContext.tsx`). This provides the current user's information to all components.
-- **User Creation:** When a user registers, their account is created in Firebase Authentication on the client side. Immediately after, a request is sent to the backend with the user's ID token. The backend verifies this token and creates a corresponding user document in the Firestore database.
+### User Data Flow
 
-## Available Scripts
-
-- **`npm run dev`**: Starts the development server with hot reloading.
-- **`npm run build`**: Compiles the TypeScript and React code into production-ready JavaScript files.
-- **`npm run preview`**: Starts a local server to preview the production build.
+- **Centralized State**: The `AuthContext` (`src/context/AuthContext.tsx`) centrally manages the authentication state, providing user information to all components.
+- **User Creation**: Upon registration, a user account is created in Firebase Authentication on the client side. Subsequently, an ID token is sent to the backend for verification, leading to the creation of a corresponding user document in the Firestore database.
+- **User Login**: When a user signs in, Firebase authentication handles the process on the client side, and the `AuthContext` stores the user's details.
