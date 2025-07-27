@@ -14,6 +14,7 @@ import { AuthProvider, AuthContext } from "./context/AuthContext";
 import RegisterPage from "./pages/RegisterPage";
 import SchedulePage from "./pages/SchedulePage";
 import PlanPage from "./pages/PlanPage";
+import PlanningPage from "./pages/PlanningPage";
 import SettingsPage from "./pages/SettingsPage";
 import ProtectedRoute from "./components/ProtectedRoute";
 import BottomNav from "./components/BottomNav";
@@ -135,6 +136,14 @@ const AppRoutes: React.FC = () => {
           element={
             <ProtectedRoute>
               <PlanPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/planning"
+          element={
+            <ProtectedRoute>
+              <PlanningPage />
             </ProtectedRoute>
           }
         />

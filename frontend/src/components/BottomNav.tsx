@@ -12,7 +12,11 @@ const navItems = [
   { path: "/home", icon: <IoHomeOutline size={24} />, label: "Home" },
   { path: "/setting", icon: <IoSettingsOutline size={24} />, label: "Setup" },
   { path: "/students", icon: <IoPeopleOutline size={24} />, label: "Students" },
-  { path: "/plan", icon: <IoCalendarOutline size={24} />, label: "Planning" },
+  {
+    path: "/planning",
+    icon: <IoCalendarOutline size={24} />,
+    label: "Planning",
+  },
   { path: "/schedule", icon: <IoBookOutline size={24} />, label: "Daily" },
 ];
 
