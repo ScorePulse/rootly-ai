@@ -15,7 +15,6 @@ console.log({
   project_location,
   project_rag_id,
 });
-
 const ai = new GoogleGenAI({
   vertexai: true,
   project: projectID,
