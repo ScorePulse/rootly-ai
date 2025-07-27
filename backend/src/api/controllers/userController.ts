@@ -117,12 +117,13 @@ const getTasks = async (req: Request, res: Response) => {
     }
 
     const userData = userDoc.data();
-    const tasks = userData?.tasks || [];
+    // Ensure tasks is always an array, even if the field doesn't exist
+    const tasks = Array.isArray(userData?.tasks) ? userData.tasks : [];
 
     res.status(200).json({ tasks });
   } catch (error: any) {
     console.error("Get tasks error:", error);
-    res.status(400).json({ error: error.message });
+    res.status(500).json({ error: error.message });
   }
 };
 
