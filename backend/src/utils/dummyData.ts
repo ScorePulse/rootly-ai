@@ -90,7 +90,7 @@ async function generateStudentSummary(student: any): Promise<string> {
   }
 }
 
-export const createDummyStudents = async (count: number) => {
+export const createDummyStudents = async (count: number, userId: string) => {
   const students = [];
   for (let i = 0; i < count; i++) {
     const firstName = getRandomElement(firstNames);
@@ -113,6 +113,7 @@ export const createDummyStudents = async (count: number) => {
       preferredLearningStyle,
       specialNeedsOrAccommodations: specialNeeds,
       additionalNotes,
+      userId,
       summary: "",
     };
 

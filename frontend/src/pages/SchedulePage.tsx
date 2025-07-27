@@ -1,5 +1,7 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import { Calendar, Download, Volume2, RefreshCw, BookOpen } from "lucide-react";
+import { getSchedules } from "../api";
+import { AuthContext } from "../context/AuthContext";
 
 interface Activity {
   time: string;
@@ -16,35 +18,41 @@ interface Day {
   activities: Activity[];
 }
 
-const scheduleData: Day[] = [
-  {
-    name: "Monday",
-    status: "completed",
-    activities: [
-      {
-        time: "9:00 - 9:15",
-        title: "Morning Circle & Goal Setting",
-        description:
-          "Daily greeting, weather check, and learning objectives review",
-        category: "General",
-        status: "Completed",
-        icon: Volume2,
-      },
-      {
-        time: "9:15 - 9:45",
-        title: "Mathematics Workshop",
-        description: "Introduction to fractions and group activities",
-        category: "Mathematics",
-        status: "Completed",
-        icon: RefreshCw,
-      },
-    ],
-  },
-  // ... more days can be added here
-];
-
 const SchedulePage: React.FC = () => {
   const [activeTab, setActiveTab] = useState("Learning Programs");
+  const [scheduleData, setScheduleData] = useState<Day[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const { currentUser } = useContext(AuthContext);
+
+  useEffect(() => {
+    const fetchSchedules = async () => {
+      if (!currentUser) return;
+      try {
+        const response = await getSchedules(currentUser.uid);
+        // Assuming the API returns an array of schedules, and we take the first one
+        if (response.data && response.data.length > 0) {
+          setScheduleData(response.data[0].schedule);
+        }
+      } catch (error) {
+        console.error("Error fetching schedules:", error);
+        setError("Failed to fetch schedules. Please try again later.");
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchSchedules();
+  }, [currentUser]);
+
+  if (loading) {
+    return <div className="bg-gray-50 min-h-screen p-8">Loading...</div>;
+  }
+
+  if (error) {
+    return (
+      <div className="bg-gray-50 min-h-screen p-8 text-red-500">{error}</div>
+    );
+  }
 
   return (
     <div className="bg-gray-50 min-h-screen p-8">

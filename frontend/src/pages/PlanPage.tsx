@@ -1,6 +1,6 @@
-import React, { useState, useCallback, useRef } from "react";
-// Import the streaming function
+import React, { useState, useCallback, useRef, useContext } from "react";
 import { sendMessageStream } from "../api";
+import { AuthContext } from "../context/AuthContext";
 
 interface Message {
   text: string;
@@ -12,11 +12,10 @@ const PlanPage: React.FC = () => {
   const [input, setInput] = useState("");
   const [isStreaming, setIsStreaming] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const { currentUser } = useContext(AuthContext);
 
-  // Use a ref to store the index of the bot message being streamed to
-  // This is crucial because `onData`, `onError` will not re-render every time
-  // `messages` or `currentBotMessageIndex` state updates inside `handleSend`.
-  // A ref will give them the *current* mutable value without re-creating the callbacks.
+  // Use a ref to store the index of the bot message being streamed to.
+  // This gives callbacks access to the *current* index without re-rendering.
   const currentBotMessageIndexRef = useRef<number | null>(null);
 
   // Callbacks for streaming - defined at the top level
@@ -64,9 +63,9 @@ const PlanPage: React.FC = () => {
 
   const handleSend = useCallback(async () => {
     const trimmedInput = input.trim();
-    if (trimmedInput === "" || isStreaming) return;
+    if (trimmedInput === "" || isStreaming || !currentUser) return;
 
-    // 1. Add user message
+    // 1. Add user message and clear input
     const userMessage: Message = { text: trimmedInput, sender: "user" };
     setMessages((prevMessages) => [...prevMessages, userMessage]);
     setInput("");
@@ -85,29 +84,39 @@ const PlanPage: React.FC = () => {
     currentBotMessageIndexRef.current = newBotMessageIndex; // Set the ref
 
     try {
-      // 3. Start the streaming process
-      await sendMessageStream(trimmedInput, onData, onError, onComplete);
-    } catch (initialError: any) {
-      console.error("Initial stream setup error:", initialError);
-      setError(initialError.message || "Failed to initiate chat stream.");
-      setIsStreaming(false);
-      currentBotMessageIndexRef.current = null;
-
-      // Remove the empty bot placeholder if the stream didn't even begin
-      setMessages((prevMessages) =>
-        prevMessages.slice(0, prevMessages.length - 1)
+      // 3. Start the streaming process. The onData callback will handle UI updates.
+      // The promise resolves with the full text when the stream is complete.
+      const fullResponse = await sendMessageStream(
+        trimmedInput,
+        currentUser.uid,
+        onData
       );
+      console.log(
+        "Stream completed successfully. Full response:",
+        fullResponse
+      );
+    } catch (err: any) {
+      console.error("Stream Error:", err);
+      setError(err.message || "An unknown error occurred during streaming.");
+      setIsStreaming(false);
 
-      // Add a single error message
-      setMessages((prevMessages) => [
-        ...prevMessages,
-        {
-          text: `Error: ${initialError.message || "Could not get a response."}`,
-          sender: "bot",
-        },
-      ]);
+      setMessages((prevMessages) => {
+        const updatedMessages = [...prevMessages];
+        const indexToUpdate = currentBotMessageIndexRef.current;
+        if (indexToUpdate !== null && updatedMessages[indexToUpdate]) {
+          updatedMessages[indexToUpdate].text += `\n[ERROR: ${
+            err.message || "Streaming error."
+          }]`;
+        }
+        return updatedMessages;
+      });
+      currentBotMessageIndexRef.current = null; // Clear the ref on error
     }
-  }, [input, isStreaming, messages.length, onData]);
+
+    // 4. This block runs after the stream completes or fails.
+    setIsStreaming(false);
+    currentBotMessageIndexRef.current = null; // Clear the ref
+  }, [input, isStreaming, messages.length, onData, currentUser]);
 
   return (
     <div className="flex flex-col h-full p-4">
