@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 
 interface Activity {
   id: string;
@@ -21,6 +21,11 @@ const PlanningPage: React.FC = () => {
   const [activeTab, setActiveTab] = useState<"programs" | "content">(
     "programs"
   );
+
+  // Scroll to top when component mounts
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
 
   const weeklySchedule: DaySchedule[] = [
     {

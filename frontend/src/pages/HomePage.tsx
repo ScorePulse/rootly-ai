@@ -28,6 +28,23 @@ const HomePage: React.FC = () => {
   return (
     <div className="min-h-screen bg-gray-50 p-4">
       <div className="max-w-4xl mx-auto">
+        {/* Welcome Header */}
+        <div className="bg-blue-600 rounded-lg p-4 mb-6 flex items-center">
+          <div className="w-10 h-10 bg-white rounded-full flex items-center justify-center mr-3">
+            <span className="text-blue-600 font-semibold text-sm">
+              {getInitials(currentUser?.displayName, currentUser?.email)}
+            </span>
+          </div>
+          <div className="text-white">
+            <h1 className="text-lg font-semibold">
+              Welcome back, {currentUser?.email || "User"}!
+            </h1>
+            <p className="text-blue-100 text-sm">
+              Managing 5 grades • 45 students
+            </p>
+          </div>
+        </div>
+
         {/* Stats Cards */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
           <StatCard
