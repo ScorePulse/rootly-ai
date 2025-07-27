@@ -7,7 +7,14 @@ import { db } from "../../config/admin";
 // @route   POST /api/test/create-students
 // @access  Public
 const createStudents = asyncHandler(async (req: Request, res: Response) => {
-  const students = await createDummyStudents(30);
+  const { userId } = req.body;
+
+  if (!userId) {
+    res.status(400).json({ message: "Missing userId in request body" });
+    return;
+  }
+
+  const students = await createDummyStudents(30, userId);
 
   const studentsCollection = db.collection("students");
   const batch = db.batch();
@@ -19,17 +26,12 @@ const createStudents = asyncHandler(async (req: Request, res: Response) => {
 
   await batch.commit();
 
-  res.status(201).json({
-    message: "30 dummy students created and saved to Firestore successfully",
-    students,
-  });
+  res
+    .status(201)
+    .json({
+      message: "30 dummy students created and saved to Firestore successfully",
+      students,
+    });
 });
 
-// @desc    Test route
-// @route   GET /api/test
-// @access  Public
-const testRouteHandler = asyncHandler(async (req: Request, res: Response) => {
-  res.status(200).json({ message: "Test route is working" });
-});
-
-export { createStudents, testRouteHandler as testRoute };
+export { createStudents };

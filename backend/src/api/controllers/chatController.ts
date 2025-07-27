@@ -1,14 +1,14 @@
 import { Request, Response } from "express";
 import { MasterPlannerAgent } from "../../agents/MasterPlannerAgent";
-import { sendMessage } from "../../agents";
-import { PlannerAgent } from "../../agents/plannerAgent";
+import { db } from "../../config/admin";
 
-// Instantiate your MasterPlannerAgent outside the controller function
-// so it's not re-created on every request, which is more efficient.
 const masterPlannerAgent = new MasterPlannerAgent();
 
-// Removed initialMessage and isFirstMessage as they conflict with a streaming endpoint.
-// If an initial welcome is needed, it should be sent as the first SSE chunk or handled on the client.
+const getWeekId = () => {
+  const now = new Date();
+  const startOfWeek = new Date(now.setDate(now.getDate() - now.getDay()));
+  return startOfWeek.toISOString().split("T")[0];
+};
 
 export const chatController = async (req: Request, res: Response) => {
   // Set headers for Server-Sent Events (SSE)
@@ -19,7 +19,7 @@ export const chatController = async (req: Request, res: Response) => {
   res.setHeader("X-Accel-Buffering", "no"); // Disable proxy buffering for Nginx/Apache, etc.
 
   // Extract the message from the request body
-  const { message } = req.body;
+  const { message, userId } = req.body;
 
   // Basic validation for the message
   if (!message) {
@@ -30,10 +30,23 @@ export const chatController = async (req: Request, res: Response) => {
     res.end();
     return;
   }
+  if (!userId) {
+    return res.status(401).json({ message: "Unauthorized" });
+  }
 
   try {
     // Call the MasterPlannerAgent's run method, which now returns a JSON object
     const schedule = await masterPlannerAgent.run(message);
+
+    const weekId = getWeekId();
+    const scheduleId = `${userId}_${weekId}`;
+
+    await db.collection("schedules").doc(scheduleId).set({
+      userId,
+      weekId,
+      createdAt: new Date(),
+      schedule,
+    });
 
     // Send the formatted JSON schedule to the client
     res.status(200).json(schedule);
