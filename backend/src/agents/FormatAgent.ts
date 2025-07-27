@@ -14,6 +14,7 @@ interface Activity {
 interface Day {
   name: string;
   status: string;
+  weekday_id: number;
   activities: Activity[];
 }
 
@@ -28,7 +29,8 @@ export class FormatAgent {
   async run(planText: string): Promise<Day[]> {
     const prompt = `
       You are a formatting agent. Your task is to convert the following weekly learning schedule text into a structured JSON format.
-      The JSON output should be an array of Day objects. Each Day object should have 'name', 'status', and an array of 'activities'.
+      The JSON output should be an array of Day objects. Each Day object should have 'name', 'status', 'weekday_id', and an array of 'activities'.
+      The 'weekday_id' should be a number representing the day of the week (1 for Monday, 2 for Tuesday, ..., 7 for Sunday).
       Each Activity object should have 'time', 'title', 'description', 'category', 'status', and 'icon'.
       For the 'icon' field, choose an appropriate icon name from the lucide-react library (e.g., 'BookOpen', 'RefreshCw', 'Volume2', 'Calendar').
 

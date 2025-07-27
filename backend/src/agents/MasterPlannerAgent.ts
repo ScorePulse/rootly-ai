@@ -8,7 +8,7 @@ import { GoogleGenAI } from "@google/genai";
 
 // Agent interface (optional, but good practice)
 interface IAgent {
-  run(prompt: string): Promise<any>;
+  run(prompt: string, userId: string): Promise<any>;
 }
 
 // Master Planner Agent
@@ -28,25 +28,35 @@ export class MasterPlannerAgent implements IAgent {
     this.formatAgent = new FormatAgent();
   }
 
-  async run(prompt: string): Promise<any> {
+  async run(prompt: string, userId: string): Promise<any> {
     // 1. Gather context from sub-agents
-    const teacherContext = await this.teacherContextAgent.getContext();
+    const teacherContext = await this.teacherContextAgent.getContext(userId);
     const gradesSyllabusContext =
       await this.gradesSyllabusContextAgent.getContext();
     const studentContext = await this.studentContextAgent.getContext();
 
     // 2. Construct a detailed prompt for the Gemini model
     const fullPrompt = `
-      As the Master Planner Agent, your task is to create a personalized weekly lesson plan.
+      As the Master Planner Agent, your task is to create a detailed and personalized weekly lesson plan for a teacher.
 
-      Here is the context:
-      - Teacher Context: ${JSON.stringify(teacherContext)}
-      - Grades & Syllabus Context: ${JSON.stringify(gradesSyllabusContext)}
-      - Student Context: ${JSON.stringify(studentContext)}
+      **CONTEXT:**
+      - **Teacher Profile:** ${JSON.stringify(teacherContext)}
+      - **Syllabus and Grade Level:** ${JSON.stringify(gradesSyllabusContext)}
+      - **Student Profile:** ${JSON.stringify(studentContext)}
 
-      Teacher's Request: "${prompt}"
+      **TEACHER'S REQUEST:**
+      "${prompt}"
 
-      Based on all this information, generate a weekly plan.
+      **INSTRUCTIONS:**
+      Based on all the provided context, generate a comprehensive weekly learning schedule from Monday to Friday.
+
+      For each day, provide a detailed schedule of activities. Each activity must include:
+      1.  **Time Slot:** (e.g., 9:00 - 9:45)
+      2.  **Activity Title:** (e.g., Mathematics Workshop)
+      3.  **Subject/Category:** (e.g., Mathematics, English, Science, Art, General)
+      4.  **Brief Description:** A short sentence explaining the activity's objective.
+
+      Ensure the plan covers various subjects throughout the week, tailored to the students' needs and the teacher's goals. The output should be a clear, well-structured text that can be easily parsed.
     `;
 
     // 3. Call the Gemini API to get the raw plan text

@@ -35,8 +35,7 @@ export const chatController = async (req: Request, res: Response) => {
   }
 
   try {
-    // Call the MasterPlannerAgent's run method, which now returns a JSON object
-    const schedule = await masterPlannerAgent.run(message);
+    const schedule = await masterPlannerAgent.run(message, userId);
 
     const weekId = getWeekId();
     const scheduleId = `${userId}_${weekId}`;

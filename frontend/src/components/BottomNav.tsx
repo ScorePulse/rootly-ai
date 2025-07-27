@@ -10,14 +10,13 @@ import {
 
 const navItems = [
   { path: "/home", icon: <IoHomeOutline size={24} />, label: "Home" },
-  { path: "/setting", icon: <IoSettingsOutline size={24} />, label: "Setup" },
   { path: "/students", icon: <IoPeopleOutline size={24} />, label: "Students" },
+  { path: "/planning", icon: <IoBookOutline size={24} />, label: "Daily" },
   {
-    path: "/planning",
+    path: "/schedule",
     icon: <IoCalendarOutline size={24} />,
     label: "Planning",
   },
-  { path: "/schedule", icon: <IoBookOutline size={24} />, label: "Daily" },
 ];
 
 const BottomNav: React.FC = () => {
