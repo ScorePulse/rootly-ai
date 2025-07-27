@@ -60,11 +60,15 @@ const TodaysSchedule: React.FC = () => {
   }, [currentUser]);
 
   if (loading) {
-    return <div className="bg-white p-4 rounded-lg shadow">Loading schedule...</div>;
+    return (
+      <div className="bg-white p-4 rounded-lg shadow">Loading schedule...</div>
+    );
   }
 
   if (error) {
-    return <div className="bg-white p-4 rounded-lg shadow text-red-500">{error}</div>;
+    return (
+      <div className="bg-white p-4 rounded-lg shadow text-red-500">{error}</div>
+    );
   }
 
   return (
@@ -74,7 +78,9 @@ const TodaysSchedule: React.FC = () => {
         <div className="space-y-3">
           {mondaysActivities.map((item, index) => (
             <div key={index} className="flex items-center">
-              <div className="text-sm text-gray-500 w-16">{item.time.split(" - ")[0]}</div>
+              <div className="text-sm text-gray-500 w-16">
+                {item.time.split(" - ")[0]}
+              </div>
               <div className="w-1 h-1 bg-gray-300 rounded-full mx-3"></div>
               <div>
                 <p className="font-semibold">{item.title}</p>
