@@ -61,11 +61,32 @@ export const deleteTask = (uid: string, taskId: string) => {
   return api.delete(`/users/tasks/${uid}/${taskId}`);
 };
 
+// AI Task Planning API
+export const generateAITasks = (uid: string) => {
+  return api.post(`/users/ai-tasks/${uid}`);
+};
+
 // Student API
+export interface StudentData {
+  firstName: string;
+  lastName: string;
+  grade: string;
+  age: number;
+  dateOfBirth?: string;
+  preferredLearningStyle?: string;
+  specialNeedsOrAccommodations?: string;
+  additionalNotes?: string;
+  overallScore?: number;
+  dreamScore?: number;
+  attendance?: number;
+  progress?: "Improving" | "Stable" | "Declining";
+  lastAssessed?: string;
+}
+
 export const getAllStudents = () => api.get("/students");
 export const getStudentById = (id: string) => api.get(`/students/${id}`);
-export const createStudent = (data: any) => api.post("/students", data);
-export const updateStudent = (id: string, data: any) =>
+export const createStudent = (data: StudentData) => api.post("/students", data);
+export const updateStudent = (id: string, data: Partial<StudentData>) =>
   api.put(`/students/${id}`, data);
 export const deleteStudent = (id: string) => api.delete(`/students/${id}`);
 

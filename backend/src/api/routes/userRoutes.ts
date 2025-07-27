@@ -12,6 +12,7 @@ import {
   addTask,
   updateTask,
   deleteTask,
+  generateAITasks,
 } from "../controllers/userController";
 
 const router = express.Router();
@@ -46,6 +47,9 @@ router.get("/tasks/:uid", authMiddleware, getTasks);
 router.post("/tasks/:uid", authMiddleware, addTask);
 router.put("/tasks/:uid/:taskId", authMiddleware, updateTask);
 router.delete("/tasks/:uid/:taskId", authMiddleware, deleteTask);
+
+// AI Task Planning route
+router.post("/ai-tasks/:uid", authMiddleware, generateAITasks);
 
 router.post(
   "/create",
