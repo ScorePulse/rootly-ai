@@ -9,6 +9,7 @@ import { Toaster } from "react-hot-toast";
 import LoginPage from "./pages/LoginPage";
 import HomePage from "./pages/HomePage";
 import StudentPage from "./pages/StudentPage";
+import AddStudentPage from "./pages/AddStudentPage";
 import Header from "./components/Header";
 import { AuthProvider, AuthContext } from "./context/AuthContext";
 import RegisterPage from "./pages/RegisterPage";
@@ -143,6 +144,14 @@ const AppRoutes: React.FC = () => {
           element={
             <ProtectedRoute>
               <StudentPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/add-student"
+          element={
+            <ProtectedRoute>
+              <AddStudentPage />
             </ProtectedRoute>
           }
         />

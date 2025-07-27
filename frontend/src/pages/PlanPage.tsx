@@ -107,11 +107,10 @@ const PlanPage: React.FC = () => {
         },
       ]);
     }
-  }, [input, isStreaming, messages.length, onData, onError, onComplete]); // Add onData, onError, onComplete as dependencies
+  }, [input, isStreaming, messages.length, onData]);
 
   return (
     <div className="flex flex-col h-full p-4">
-      <h1 className="text-2xl font-bold mb-4">Plan Page</h1>
       <div className="flex-grow overflow-y-auto mb-4 p-4 bg-gray-100 rounded-lg">
         {messages.map((message, index) => (
           <div
