@@ -2,7 +2,6 @@ import React from "react";
 import { NavLink } from "react-router-dom";
 import {
   IoHomeOutline,
-  IoSettingsOutline,
   IoPeopleOutline,
   IoCalendarOutline,
   IoBookOutline,
@@ -10,7 +9,6 @@ import {
 
 const navItems = [
   { path: "/home", icon: <IoHomeOutline size={24} />, label: "Home" },
-  { path: "/setting", icon: <IoSettingsOutline size={24} />, label: "Setup" },
   { path: "/students", icon: <IoPeopleOutline size={24} />, label: "Students" },
   {
     path: "/planning",

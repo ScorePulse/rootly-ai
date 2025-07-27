@@ -1,13 +1,34 @@
 import React, { useState, useEffect, useContext } from "react";
 import { AuthContext } from "../context/AuthContext";
-import { getTasks, addTask, updateTask, deleteTask } from "../api";
+import {
+  getTasks,
+  addTask,
+  updateTask,
+  deleteTask,
+  generateAITasks as generateAITasksAPI,
+} from "../api";
 import toast from "react-hot-toast";
 
 interface Task {
   id: string;
   title: string;
   status: "pending" | "done";
-  type: "review" | "prepare" | "send";
+  type:
+    | "review"
+    | "prepare"
+    | "send"
+    | "study"
+    | "practice"
+    | "planning"
+    | "assessment"
+    | "individual_support"
+    | "safety"
+    | "communication";
+  isAIGenerated?: boolean;
+  priority?: "low" | "medium" | "high";
+  estimatedTime?: string;
+  subject?: string;
+  description?: string;
 }
 
 const MyTasks: React.FC = () => {
@@ -51,6 +72,16 @@ const MyTasks: React.FC = () => {
         return "🧪";
       case "send":
         return "📧";
+      case "study":
+        return "📚";
+      case "practice":
+        return "✏️";
+      case "planning":
+        return "📅";
+      case "assessment":
+        return "📊";
+      case "individual_support":
+        return "👥";
       default:
         return "📝";
     }
@@ -110,6 +141,25 @@ const MyTasks: React.FC = () => {
     }
   };
 
+  const generateAITasks = async () => {
+    if (currentUser?.uid) {
+      try {
+        toast.loading("AI is planning your tasks...", { id: "ai-planning" });
+        const response = await generateAITasksAPI(currentUser.uid);
+        const newTasks = response.data.tasks || [];
+
+        // Add the new AI-generated tasks to the existing tasks
+        setTasks((prevTasks) => [...prevTasks, ...newTasks]);
+        toast.success(`AI generated ${newTasks.length} tasks for you!`, {
+          id: "ai-planning",
+        });
+      } catch (error) {
+        console.error("Error generating AI tasks:", error);
+        toast.error("Failed to generate AI tasks", { id: "ai-planning" });
+      }
+    }
+  };
+
   return (
     <div className="bg-white rounded-lg shadow-sm p-6">
       <div className="flex items-center justify-between mb-4">
@@ -130,6 +180,21 @@ const MyTasks: React.FC = () => {
           onClick={() => setShowAddTask(!showAddTask)}
         >
           <span className="text-lg">{showAddTask ? "×" : "+"}</span>
+        </button>
+
+        {/* AI Planning Button */}
+        <button
+          className="w-8 h-8 bg-blue-600 text-white rounded-full flex items-center justify-center hover:bg-blue-700 transition-colors relative group"
+          onClick={() => generateAITasks()}
+          title="Uses AI to help plan your tasks"
+        >
+          <span className="text-sm">🤖</span>
+
+          {/* Tooltip */}
+          <div className="absolute bottom-full mb-2 left-1/2 transform -translate-x-1/2 bg-gray-900 text-white text-xs rounded py-1 px-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 whitespace-nowrap z-10">
+            Uses AI to help plan your tasks
+            <div className="absolute top-full left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-gray-900"></div>
+          </div>
         </button>
       </div>
 
@@ -175,15 +240,54 @@ const MyTasks: React.FC = () => {
               <span>{getTaskIcon(task.type)}</span>
             </div>
             <div className="flex-1">
-              <p
-                className={`text-sm font-medium ${
-                  task.status === "done"
-                    ? "text-gray-500 line-through"
-                    : "text-gray-900"
-                }`}
-              >
-                {task.title}
-              </p>
+              <div className="flex items-center gap-2 mb-1">
+                <p
+                  className={`text-sm font-medium ${
+                    task.status === "done"
+                      ? "text-gray-500 line-through"
+                      : "text-gray-900"
+                  }`}
+                >
+                  {task.title}
+                </p>
+                {task.isAIGenerated && (
+                  <span className="bg-blue-100 text-blue-800 px-2 py-0.5 rounded text-xs font-medium">
+                    AI Generated
+                  </span>
+                )}
+                {task.priority && task.priority !== "medium" && (
+                  <span
+                    className={`px-2 py-0.5 rounded text-xs font-medium ${
+                      task.priority === "high"
+                        ? "bg-red-100 text-red-800"
+                        : "bg-gray-100 text-gray-800"
+                    }`}
+                  >
+                    {task.priority}
+                  </span>
+                )}
+              </div>
+              {(task.estimatedTime || task.subject || task.description) && (
+                <div className="text-xs text-gray-500 space-y-1">
+                  {task.estimatedTime && (
+                    <div className="flex items-center gap-1">
+                      <span>⏱️</span>
+                      <span>{task.estimatedTime}</span>
+                    </div>
+                  )}
+                  {task.subject && task.subject !== "General" && (
+                    <div className="flex items-center gap-1">
+                      <span>📚</span>
+                      <span>{task.subject}</span>
+                    </div>
+                  )}
+                  {task.description && (
+                    <div className="text-gray-600 mt-1 text-xs">
+                      {task.description}
+                    </div>
+                  )}
+                </div>
+              )}
             </div>
             <button
               onClick={() => removeTaskFromDb(task.id)}
@@ -216,9 +320,26 @@ const MyTasks: React.FC = () => {
                   <span>{getTaskIcon(task.type)}</span>
                 </div>
                 <div className="flex-1">
-                  <p className="text-sm font-medium text-gray-500 line-through">
-                    {task.title}
-                  </p>
+                  <div className="flex items-center gap-2 mb-1">
+                    <p className="text-sm font-medium text-gray-500 line-through">
+                      {task.title}
+                    </p>
+                    {task.isAIGenerated && (
+                      <span className="bg-blue-100 text-blue-800 px-2 py-0.5 rounded text-xs font-medium opacity-60">
+                        AI Generated
+                      </span>
+                    )}
+                  </div>
+                  {(task.estimatedTime || task.subject) && (
+                    <div className="text-xs text-gray-400 flex items-center gap-3">
+                      {task.estimatedTime && (
+                        <span>⏱️ {task.estimatedTime}</span>
+                      )}
+                      {task.subject && task.subject !== "General" && (
+                        <span>📚 {task.subject}</span>
+                      )}
+                    </div>
+                  )}
                 </div>
                 <button
                   onClick={() => removeTaskFromDb(task.id)}
@@ -260,24 +381,6 @@ const MyTasks: React.FC = () => {
             </div>
             <span className="text-xs font-medium text-gray-700">Insights</span>
           </div>
-        </div>
-      </div>
-
-      {/* Dropout Alert */}
-      <div className="mt-4 p-3 bg-red-50 border border-red-200 rounded-lg">
-        <div className="flex items-start gap-2">
-          <div className="w-5 h-5 bg-red-100 rounded-full flex items-center justify-center mt-0.5">
-            <span className="text-red-600 text-xs">⚠</span>
-          </div>
-          <div className="flex-1">
-            <h4 className="text-sm font-medium text-red-900">Dropout Alert</h4>
-            <p className="text-xs text-red-700 mt-1">
-              2 students showing high dropout risk indicators
-            </p>
-          </div>
-          <button className="text-red-600 text-xs font-medium hover:underline">
-            View
-          </button>
         </div>
       </div>
     </div>
