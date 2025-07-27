@@ -5,6 +5,7 @@ import cors from "cors";
 import userRoutes from "./api/routes/userRoutes";
 import chatRoutes from "./api/routes/chatRoutes";
 import testRoutes from "./api/routes/testRoutes";
+import studentRoutes from "./api/routes/studentRoutes";
 import loggingMiddleware from "./middleware/loggingMiddleware";
 
 const app = express();
@@ -23,6 +24,7 @@ app.get("/health", (req: Request, res: Response) => {
 app.use("/api/users", userRoutes);
 app.use("/api/chat", chatRoutes);
 app.use("/api/test", testRoutes);
+app.use("/api/students", studentRoutes);
 
 const PORT = process.env.PORT || 5000;
 
