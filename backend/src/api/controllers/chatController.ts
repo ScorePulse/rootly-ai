@@ -32,28 +32,16 @@ export const chatController = async (req: Request, res: Response) => {
   }
 
   try {
-    // Call the MasterPlannerAgent's run method to get the stream
-    const stream = await masterPlannerAgent.run(message);
+    // Call the MasterPlannerAgent's run method, which now returns a JSON object
+    const schedule = await masterPlannerAgent.run(message);
 
-    // Iterate over the stream and send each chunk to the client
-    for await (const chunk of stream) {
-      if (chunk) {
-        // Format the chunk as a Server-Sent Event (SSE)
-        res.write(`data: ${JSON.stringify({ content: chunk })}\n\n`);
-      }
-    }
-
-    // Once the stream from the agent is complete, end the HTTP response
-    res.end();
+    // Send the formatted JSON schedule to the client
+    res.status(200).json(schedule);
   } catch (error: any) {
-    console.error("Error in chatController streaming:", error);
-    // If an error occurs, send an SSE error event to the client
-    // This allows the client to gracefully handle errors during the stream.
-    res.write(
-      `event: error\ndata: ${JSON.stringify({
-        message: error.message || "An error occurred during chat streaming.",
-      })}\n\n`
-    );
-    res.end();
+    console.error("Error in chatController:", error);
+    res.status(500).json({
+      message:
+        error.message || "An error occurred while generating the schedule.",
+    });
   }
 };
