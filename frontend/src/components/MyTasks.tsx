@@ -1,4 +1,7 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useContext } from "react";
+import { AuthContext } from "../context/AuthContext";
+import { getTasks, addTask, updateTask, deleteTask } from "../api";
+import toast from "react-hot-toast";
 
 interface Task {
   id: string;
@@ -8,32 +11,37 @@ interface Task {
 }
 
 const MyTasks: React.FC = () => {
-  const [tasks, setTasks] = useState<Task[]>([
-    {
-      id: "1",
-      title: "Review lesson plans for Week 5",
-      status: "pending",
-      type: "review",
-    },
-    {
-      id: "2",
-      title: "Prepare materials for Science experiment",
-      status: "pending",
-      type: "prepare",
-    },
-    {
-      id: "3",
-      title: "Send progress reports to parents",
-      status: "pending",
-      type: "send",
-    },
-  ]);
-
+  const { currentUser } = useContext(AuthContext);
+  const [tasks, setTasks] = useState<Task[]>([]);
   const [newTaskTitle, setNewTaskTitle] = useState("");
   const [showAddTask, setShowAddTask] = useState(false);
+  const [showAllTasks, setShowAllTasks] = useState(false);
+  const [loading, setLoading] = useState(true);
+
+  // Fetch tasks on component mount
+  useEffect(() => {
+    const fetchTasks = async () => {
+      if (currentUser?.uid) {
+        try {
+          const response = await getTasks(currentUser.uid);
+          setTasks(response.data.tasks || []);
+        } catch (error) {
+          console.error("Error fetching tasks:", error);
+          toast.error("Failed to load tasks");
+        } finally {
+          setLoading(false);
+        }
+      }
+    };
+
+    fetchTasks();
+  }, [currentUser?.uid]);
 
   const pendingTasks = tasks.filter((task) => task.status === "pending");
   const doneTasks = tasks.filter((task) => task.status === "done");
+
+  // Show 3 tasks by default, 4 when "View all" is clicked
+  const tasksToShow = showAllTasks ? pendingTasks : pendingTasks.slice(0, 3);
 
   const getTaskIcon = (type: string) => {
     switch (type) {
@@ -48,38 +56,58 @@ const MyTasks: React.FC = () => {
     }
   };
 
-  const addTask = () => {
-    if (newTaskTitle.trim()) {
-      const newTask: Task = {
-        id: Date.now().toString(),
-        title: newTaskTitle.trim(),
-        status: "pending",
-        type: "review", // Default type
-      };
-      setTasks([...tasks, newTask]);
-      setNewTaskTitle("");
-      setShowAddTask(false);
+  const addTaskToDb = async () => {
+    if (newTaskTitle.trim() && currentUser?.uid) {
+      try {
+        const response = await addTask(currentUser.uid, {
+          title: newTaskTitle.trim(),
+          type: "review", // Default type
+        });
+
+        const newTask = response.data.task;
+        setTasks([...tasks, newTask]);
+        setNewTaskTitle("");
+        setShowAddTask(false);
+        toast.success("Task added successfully");
+      } catch (error) {
+        console.error("Error adding task:", error);
+        toast.error("Failed to add task");
+      }
     }
   };
 
-  const removeTask = (taskId: string) => {
-    setTasks(tasks.filter((task) => task.id !== taskId));
+  const removeTaskFromDb = async (taskId: string) => {
+    if (currentUser?.uid) {
+      try {
+        await deleteTask(currentUser.uid, taskId);
+        setTasks(tasks.filter((task) => task.id !== taskId));
+        toast.success("Task deleted successfully");
+      } catch (error) {
+        console.error("Error deleting task:", error);
+        toast.error("Failed to delete task");
+      }
+    }
   };
 
-  const toggleTaskStatus = (taskId: string) => {
-    setTasks(
-      tasks.map((task) =>
-        task.id === taskId
-          ? {
-              ...task,
-              status:
-                task.status === "pending"
-                  ? "done"
-                  : ("pending" as "pending" | "done"),
-            }
-          : task
-      )
-    );
+  const toggleTaskStatusInDb = async (taskId: string) => {
+    if (currentUser?.uid) {
+      const task = tasks.find((t) => t.id === taskId);
+      if (task) {
+        const newStatus = task.status === "pending" ? "done" : "pending";
+        try {
+          await updateTask(currentUser.uid, taskId, { status: newStatus });
+          setTasks(
+            tasks.map((t) =>
+              t.id === taskId ? { ...t, status: newStatus } : t
+            )
+          );
+          toast.success(`Task marked as ${newStatus}`);
+        } catch (error) {
+          console.error("Error updating task:", error);
+          toast.error("Failed to update task");
+        }
+      }
+    }
   };
 
   return (
@@ -114,12 +142,12 @@ const MyTasks: React.FC = () => {
               placeholder="Enter task title..."
               value={newTaskTitle}
               onChange={(e) => setNewTaskTitle(e.target.value)}
-              onKeyPress={(e) => e.key === "Enter" && addTask()}
+              onKeyPress={(e) => e.key === "Enter" && addTaskToDb()}
               className="flex-1 px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
               autoFocus
             />
             <button
-              onClick={addTask}
+              onClick={addTaskToDb}
               disabled={!newTaskTitle.trim()}
               className="px-4 py-2 bg-purple-600 text-white rounded-md text-sm hover:bg-purple-700 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors"
             >
@@ -130,13 +158,13 @@ const MyTasks: React.FC = () => {
       )}
 
       <div className="space-y-3">
-        {pendingTasks.map((task) => (
+        {tasksToShow.map((task) => (
           <div
             key={task.id}
             className="flex items-center gap-3 p-3 hover:bg-gray-50 rounded-lg transition-colors"
           >
             <button
-              onClick={() => toggleTaskStatus(task.id)}
+              onClick={() => toggleTaskStatusInDb(task.id)}
               className="w-6 h-6 border-2 border-gray-300 rounded hover:border-purple-500 flex items-center justify-center transition-colors"
             >
               {task.status === "done" && (
@@ -158,7 +186,7 @@ const MyTasks: React.FC = () => {
               </p>
             </div>
             <button
-              onClick={() => removeTask(task.id)}
+              onClick={() => removeTaskFromDb(task.id)}
               className="w-6 h-6 text-red-500 hover:bg-red-50 rounded flex items-center justify-center transition-colors"
             >
               ✕
@@ -179,7 +207,7 @@ const MyTasks: React.FC = () => {
                 className="flex items-center gap-3 p-3 hover:bg-gray-50 rounded-lg transition-colors opacity-60"
               >
                 <button
-                  onClick={() => toggleTaskStatus(task.id)}
+                  onClick={() => toggleTaskStatusInDb(task.id)}
                   className="w-6 h-6 border-2 border-green-500 bg-green-500 rounded flex items-center justify-center"
                 >
                   <span className="text-white text-sm">✓</span>
@@ -193,7 +221,7 @@ const MyTasks: React.FC = () => {
                   </p>
                 </div>
                 <button
-                  onClick={() => removeTask(task.id)}
+                  onClick={() => removeTaskFromDb(task.id)}
                   className="w-6 h-6 text-red-500 hover:bg-red-50 rounded flex items-center justify-center transition-colors"
                 >
                   ✕
@@ -205,9 +233,14 @@ const MyTasks: React.FC = () => {
       </div>
 
       <div className="mt-6 text-center">
-        <button className="text-blue-600 text-sm font-medium hover:underline">
-          View all {tasks.length} tasks
-        </button>
+        {pendingTasks.length > 3 && (
+          <button
+            onClick={() => setShowAllTasks(!showAllTasks)}
+            className="text-blue-600 text-sm font-medium hover:underline"
+          >
+            {showAllTasks ? "Show less" : "View all"}
+          </button>
+        )}
       </div>
 
       {/* Bottom action buttons */}

@@ -37,6 +37,30 @@ export const completeUserProfile = (uid: string) => {
   return api.put(`/users/complete-profile/${uid}`);
 };
 
+// Task API
+export const getTasks = (uid: string) => {
+  return api.get(`/users/tasks/${uid}`);
+};
+
+export const addTask = (
+  uid: string,
+  taskData: { title: string; type?: string }
+) => {
+  return api.post(`/users/tasks/${uid}`, taskData);
+};
+
+export const updateTask = (
+  uid: string,
+  taskId: string,
+  updates: { status?: string; title?: string; type?: string }
+) => {
+  return api.put(`/users/tasks/${uid}/${taskId}`, updates);
+};
+
+export const deleteTask = (uid: string, taskId: string) => {
+  return api.delete(`/users/tasks/${uid}/${taskId}`);
+};
+
 // Student API
 export const getAllStudents = () => api.get("/students");
 export const getStudentById = (id: string) => api.get(`/students/${id}`);

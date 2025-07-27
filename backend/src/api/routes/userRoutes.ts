@@ -8,6 +8,10 @@ import {
   updateUserProfile,
   completeRegistration,
   completeProfile,
+  getTasks,
+  addTask,
+  updateTask,
+  deleteTask,
 } from "../controllers/userController";
 
 const router = express.Router();
@@ -36,6 +40,12 @@ router.post("/register", registerUser);
 router.put("/profile/:uid", authMiddleware, updateUserProfile);
 router.put("/complete-registration/:uid", authMiddleware, completeRegistration);
 router.put("/complete-profile/:uid", authMiddleware, completeProfile);
+
+// Task routes
+router.get("/tasks/:uid", authMiddleware, getTasks);
+router.post("/tasks/:uid", authMiddleware, addTask);
+router.put("/tasks/:uid/:taskId", authMiddleware, updateTask);
+router.delete("/tasks/:uid/:taskId", authMiddleware, deleteTask);
 
 router.post(
   "/create",
