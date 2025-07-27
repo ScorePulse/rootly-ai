@@ -1,31 +1,34 @@
-import { GoogleGenAI, GenerateContentResponse } from "@google/genai"; // Import GenerateContentResponse for typing
 import {
   GradesSyllabusContextAgent,
   StudentContextAgent,
   TeacherContextAgent,
 } from "./subAgents";
+import { FormatAgent } from "./FormatAgent";
+import { GoogleGenAI } from "@google/genai";
 
 // Agent interface (optional, but good practice)
 interface IAgent {
-  run(prompt: string): Promise<string>; // Update return type
+  run(prompt: string): Promise<any>;
 }
 
 // Master Planner Agent
 export class MasterPlannerAgent implements IAgent {
-  private genAI: GoogleGenAI;
+  private model: any;
   private teacherContextAgent: TeacherContextAgent;
   private gradesSyllabusContextAgent: GradesSyllabusContextAgent;
   private studentContextAgent: StudentContextAgent;
+  private formatAgent: FormatAgent;
 
   constructor() {
-    this.genAI = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY! });
+    const genAI = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY! });
+    this.model = genAI;
     this.teacherContextAgent = new TeacherContextAgent();
     this.gradesSyllabusContextAgent = new GradesSyllabusContextAgent();
     this.studentContextAgent = new StudentContextAgent();
+    this.formatAgent = new FormatAgent();
   }
 
-  // Changed the return type to Promise<AsyncGenerator<GenerateContentResponse, any, any>>
-  async run(prompt: string): Promise<string> {
+  async run(prompt: string): Promise<any> {
     // 1. Gather context from sub-agents
     const teacherContext = await this.teacherContextAgent.getContext();
     const gradesSyllabusContext =
@@ -46,30 +49,21 @@ export class MasterPlannerAgent implements IAgent {
       Based on all this information, generate a weekly plan.
     `;
 
-    // 3. Call the Gemini API and return the stream
+    // 3. Call the Gemini API to get the raw plan text
     try {
-      const result = await this.genAI.models.generateContentStream({
+      const result = await this.model.models.generateContent({
         model: "gemini-2.5-flash",
-        contents: [{ role: "user", parts: [{ text: fullPrompt }] }],
+        contents: fullPrompt,
       });
-      // Return the async generator directly
+      const planText = result.text;
 
-      // return result;
-      let fullText = "";
-      // Iterate over the async generator to collect all parts of the response
-      for await (const chunk of result) {
-        const chunkText = chunk.text;
-        if (chunkText) {
-          // Ensure the text part is not undefined or null
-          fullText += chunkText;
-        }
-      }
-
-      console.log("Lesson plan generated successfully.");
-      return fullText || ""; // Return the concatenated text
+      // 4. Format the plan text into JSON
+      const formattedPlan = await this.formatAgent.run(planText);
+      console.log({ formattedPlan });
+      return formattedPlan;
     } catch (error) {
-      console.error("Error generating content from Gemini:", error);
-      throw new Error("Failed to initialize lesson plan stream.");
+      console.error("Error in MasterPlannerAgent:", error);
+      throw new Error("Failed to generate and format the lesson plan.");
     }
   }
 
