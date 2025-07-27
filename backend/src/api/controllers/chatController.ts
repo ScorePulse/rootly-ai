@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import { MasterPlannerAgent } from "../../agents/MasterPlannerAgent";
 import { sendMessage } from "../../agents";
+import { PlannerAgent } from "../../agents/plannerAgent";
 
 // Instantiate your MasterPlannerAgent outside the controller function
 // so it's not re-created on every request, which is more efficient.
@@ -31,10 +32,16 @@ export const chatController = async (req: Request, res: Response) => {
   }
 
   try {
-    // Call the MasterPlannerAgent's run method, which now returns an AsyncGenerator (the stream)
-    const stream = await sendMessage(message);
+    // Call the MasterPlannerAgent's run method to get the stream
+    const stream = await masterPlannerAgent.run(message);
 
-    res.json({ result: stream });
+    // Iterate over the stream and send each chunk to the client
+    for await (const chunk of stream) {
+      if (chunk) {
+        // Format the chunk as a Server-Sent Event (SSE)
+        res.write(`data: ${JSON.stringify({ content: chunk })}\n\n`);
+      }
+    }
 
     // Once the stream from the agent is complete, end the HTTP response
     res.end();

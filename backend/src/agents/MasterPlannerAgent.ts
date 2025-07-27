@@ -7,9 +7,7 @@ import {
 
 // Agent interface (optional, but good practice)
 interface IAgent {
-  run(
-    prompt: string
-  ): Promise<AsyncGenerator<GenerateContentResponse, any, any>>; // Update return type
+  run(prompt: string): Promise<string>; // Update return type
 }
 
 // Master Planner Agent
@@ -27,9 +25,7 @@ export class MasterPlannerAgent implements IAgent {
   }
 
   // Changed the return type to Promise<AsyncGenerator<GenerateContentResponse, any, any>>
-  async run(
-    prompt: string
-  ): Promise<AsyncGenerator<GenerateContentResponse, any, any>> {
+  async run(prompt: string): Promise<string> {
     // 1. Gather context from sub-agents
     const teacherContext = await this.teacherContextAgent.getContext();
     const gradesSyllabusContext =
@@ -57,7 +53,20 @@ export class MasterPlannerAgent implements IAgent {
         contents: [{ role: "user", parts: [{ text: fullPrompt }] }],
       });
       // Return the async generator directly
-      return result;
+
+      // return result;
+      let fullText = "";
+      // Iterate over the async generator to collect all parts of the response
+      for await (const chunk of result) {
+        const chunkText = chunk.text;
+        if (chunkText) {
+          // Ensure the text part is not undefined or null
+          fullText += chunkText;
+        }
+      }
+
+      console.log("Lesson plan generated successfully.");
+      return fullText || ""; // Return the concatenated text
     } catch (error) {
       console.error("Error generating content from Gemini:", error);
       throw new Error("Failed to initialize lesson plan stream.");
