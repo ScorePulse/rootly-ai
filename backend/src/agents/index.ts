@@ -9,13 +9,19 @@ import {
 // Initialize Vertex with your Cloud project and location
 const projectID = process.env.VERTEX_AI_PROJECT_ID;
 const project_location = process.env.VERTEX_AI_LOCATION;
-const project_rag_id = process.env.VERTEX_AI_LOCATION;
+const project_rag_id = process.env.VERTEX_AI_RAG_ID;
+console.log({
+  projectID,
+  project_location,
+  project_rag_id,
+});
+
 const ai = new GoogleGenAI({
   vertexai: true,
   project: projectID,
   location: project_location,
 });
-const model = "gemini-2.5-flash-lite";
+const model = "gemini-2.5-flash";
 
 const tools = [
   {
@@ -24,7 +30,6 @@ const tools = [
         ragResources: [
           {
             ragCorpus: `projects/${projectID}/locations/${project_location}/ragCorpora/${project_rag_id}`,
-            similarityTopK: 20,
           },
         ],
       },

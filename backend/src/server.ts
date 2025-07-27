@@ -4,6 +4,7 @@ import express, { Request, Response } from "express";
 import cors from "cors";
 import userRoutes from "./api/routes/userRoutes";
 import chatRoutes from "./api/routes/chatRoutes";
+import testRoutes from "./api/routes/testRoutes";
 import loggingMiddleware from "./middleware/loggingMiddleware";
 
 const app = express();
@@ -21,6 +22,7 @@ app.get("/health", (req: Request, res: Response) => {
 // API routes
 app.use("/api/users", userRoutes);
 app.use("/api/chat", chatRoutes);
+app.use("/api/test", testRoutes);
 
 const PORT = process.env.PORT || 5000;
 
